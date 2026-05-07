@@ -1,4 +1,5 @@
 # Scratchpad
+
 A collaborative, AI-powered coding platform that lets students upload, edit, and manage projects together. It introduces version control concepts like commits and branching, and enables instructors to review and give feedback without direct account access.
 
 ## Getting Started

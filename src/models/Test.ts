@@ -8,5 +8,4 @@ const TestSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Test ||
-  mongoose.model("Test", TestSchema);
+export default mongoose.models.Test || mongoose.model("Test", TestSchema);

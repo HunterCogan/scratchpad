@@ -13,10 +13,7 @@ type Props = {
   deleteData: (id: string) => void;
 };
 
-export default function MongoTestData({
-  data,
-  deleteData,
-}: Props) {
+export default function MongoTestData({ data, deleteData }: Props) {
   return (
     <div className="w-full space-y-3">
       {data.map((item) => (
@@ -25,8 +22,7 @@ export default function MongoTestData({
           className="flex items-center justify-between border rounded p-3"
         >
           <div>
-            {item.message} —{" "}
-            {new Date(item.createdAt).toLocaleString()}
+            {item.message} — {new Date(item.createdAt).toLocaleString()}
           </div>
 
           <Button

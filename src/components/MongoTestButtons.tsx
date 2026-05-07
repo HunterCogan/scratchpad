@@ -7,9 +7,7 @@ type Props = {
   createData: () => void;
 };
 
-export default function MongoTestButtons({
-  createData,
-}: Props) {
+export default function MongoTestButtons({ createData }: Props) {
   return (
     <div className="flex gap-3">
       <Button onPress={createData} className="bg-green-600">

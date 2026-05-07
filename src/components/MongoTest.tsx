@@ -51,10 +51,7 @@ export default function MongoTest() {
     <div className="flex flex-col gap-5 w-full mt-6">
       <MongoTestButtons createData={createData} />
 
-      <MongoTestData
-        data={data}
-        deleteData={deleteData}
-      />
+      <MongoTestData data={data} deleteData={deleteData} />
     </div>
   );
 }
