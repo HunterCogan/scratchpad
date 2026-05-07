@@ -1,18 +1,17 @@
 # Scratchpad
 A collaborative, AI-powered coding platform that lets students upload, edit, and manage projects together. It introduces version control concepts like commits and branching, and enables instructors to review and give feedback without direct account access.
 
-## Getting Started
+## Getting Started ( Dev )
 
-First, run the development server:
+1. Install the project's dependancies.
+```bash
+npm install
+```
+2. IMPORTANT: Add .env, add "MONGODB_URI=" then contact me for the value.
 
+3. Then run the development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
