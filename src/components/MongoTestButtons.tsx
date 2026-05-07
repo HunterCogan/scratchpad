@@ -12,7 +12,7 @@ export default function MongoTestButtons({
 }: Props) {
   return (
     <div className="flex gap-3">
-      <Button onPress={createData}>
+      <Button onPress={createData} className="bg-green-600">
         <PlusIcon /> Add MongoDB Test Data
       </Button>
     </div>
