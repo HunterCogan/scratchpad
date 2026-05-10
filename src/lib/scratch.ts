@@ -1,0 +1,197 @@
+import {
+  ScratchProject,
+  Script,
+  Block,
+  BlockMap,
+  ScratchPrimitive,
+  ResolvedInput,
+} from "@/types";
+
+/**
+ * Decodes a raw `ScratchPrimitive` tuple into a `ResolvedInput`.
+ *
+ * Scratch encodes literal values as typed tuples (e.g. `[4, "10"]` is a
+ * number literal, `[12, "my var", "uid"]` is a variable reference).
+ *
+ * @param primitive - Raw primitive tuple from a block's `inputs` slot.
+ * @returns - A `ResolvedInput`, identifying the primitive `type` and providing its value.
+ */
+export function parsePrimitive(primitive: ScratchPrimitive): ResolvedInput {
+  const code = primitive[0];
+  const value = primitive[1];
+
+  switch (code) {
+    case 4: // number
+    case 5: // positive number
+    case 6: // positive integer
+    case 7: // integer
+    case 8: // angle
+      return { type: "number", value: Number(value) };
+    case 9: // color "#rrggbb"
+      return { type: "color", value: String(value) };
+    case 10: // string
+      return { type: "string", value: String(value) };
+    case 11: // broadcast message
+      return { type: "broadcast", name: String(value) };
+    case 12: // variable - [12, name, id]
+    case 13: {
+      // list - [13, name, id]
+      const [, name, id] = primitive as [12 | 13, string, string];
+      return { type: code === 12 ? "variable" : "list", name, id };
+    }
+    default:
+      return { type: "string", value: String(value) };
+  }
+}
+
+/**
+ * Resolves a named input slot on a block into a `ResolvedInput`.
+ *
+ * ```ts
+ * const steps = getInputValue(block, 'STEPS');
+ * // { type: 'number', value: 10 }
+ * // or
+ * // { type: 'block', blockId: '...' }  when a reporter block is plugged in
+ * ```
+ *
+ * @param block - The block whose inputs map will be queried.
+ * @param key - Input slot name as it appears in `block.inputs`, e.g. `"STEPS"`.
+ * @returns The resolved value, or `{ type: "empty" }` if the slot is absent or null.
+ */
+export function getInputValue(block: Block, key: string): ResolvedInput {
+  const input = block.inputs[key];
+  if (!input) return { type: "empty" };
+
+  const second = input[1];
+
+  // Inline primitive: [1, ScratchPrimitive] e.g. [1, [4, "10"]]
+  if (Array.isArray(second)) {
+    return parsePrimitive(second as ScratchPrimitive);
+  }
+
+  // Reporter block plugged in: [1 | 2 | 3, "blockId", ...]
+  // The string is always the ID of the reporter, shadow fallback is in input[2]
+  if (typeof second === "string") {
+    return { type: "block", blockId: second };
+  }
+
+  return { type: "empty" };
+}
+
+/**
+ * Returns the display value of a named field (dropdown) on a block.
+ *
+ * Fields hold static selections like key names, directions, and rotation
+ * styles. Unlike inputs, fields are always plain strings, so the function
+ *  returns a string instead of a `ResolvedInput`.
+ *
+ * ```ts
+ * const key = getFieldValue(block, 'KEY_OPTION'); // "right arrow"
+ * const dir = getFieldValue(block, 'DIRECTION');  // "left-right"
+ * ```
+ *
+ * @param block - The block whose fields map will be queried.
+ * @param key   - Field name as it appears in `block.fields`, e.g. `"KEY_OPTION"`.
+ * @returns The selected display string, or `null` if the field is absent.
+ */
+export function getFieldValue(block: Block, key: string): string | null {
+  const field = block.fields[key];
+  return field ? field[0] : null;
+}
+
+/**
+ * Resolves all input slots on a block at once.
+ *
+ * Useful for iterating inputs without knowing the key names upfront.
+ * Switch on each result's `type` to handle different value kinds:
+ *
+ * ```tsx
+ * {Object.entries(getAllInputValues(block)).map(([key, input]) => {
+ *   if (input.type !== 'number') return null
+ *   return <span key={key}>{input.value}</span>
+ * })}
+ * ```
+ *
+ * @param block - The block whose inputs will be resolved.
+ * @returns - A record mapping each input key to its resolved value.
+ */
+export function getAllInputValues(block: Block): Record<string, ResolvedInput> {
+  return Object.fromEntries(
+    Object.keys(block.inputs).map((key) => [key, getInputValue(block, key)]),
+  );
+}
+
+/**
+ * Returns all field values on a block at once.
+ *
+ * Useful when you want to display every dropdown selection a block has
+ * without knowing the key names upfront:
+ *
+ * ```tsx
+ * {Object.entries(getAllFieldValues(block)).map(([key, value]) => (
+ *   <span key={key}>{value}</span>
+ * ))}
+ * ```
+ *
+ * @param block - The block whose fields will be resolved.
+ * @returns - A record mapping each field key to its display string.
+ */
+export function getAllFieldValues(block: Block): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(block.fields).map(([key, field]) => [key, field[0]]),
+  );
+}
+
+function collectBlocks(
+  startId: string | null,
+  blockMap: BlockMap,
+  collected: Block[],
+): void {
+  let currentId: string | null = startId;
+
+  while (currentId !== null) {
+    const block = blockMap[currentId];
+    if (!block) break;
+
+    collected.push(block);
+
+    // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
+    for (const [key] of Object.entries(block.inputs)) {
+      const result = getInputValue(block, key);
+      if (result.type === "block")
+        collectBlocks(result.blockId, blockMap, collected);
+    }
+
+    currentId = block.next;
+  }
+}
+
+/**
+ * Parses raw `project.json` text and returns every `Script` across all
+ * targets (Stage + all Sprites) as a flat array.
+ *
+ * A Scratch project stores all blocks for every target in flat `BlockMap`
+ * dictionaries. This function identifies
+ * hat blocks (blocks with `topLevel: true`) as script entry points, then
+ * reconstructs each script by following `next` chains and recursing into
+ * C-block bodies via `collectBlocks`.
+ *
+ * @param raw - The full text content of a Scratch `project.json` file.
+ * @returns - A flat array of `Script` objects, one per hat block in the project.
+ */
+export function parseScripts(raw: string): Script[] {
+  const project: ScratchProject = JSON.parse(raw);
+  const scripts: Script[] = [];
+
+  for (const target of project.targets) {
+    for (const [id, block] of Object.entries(target.blocks)) {
+      if (block.topLevel && !block.shadow) {
+        const blocks: Block[] = [];
+        collectBlocks(id, target.blocks, blocks);
+        scripts.push({ hatBlockId: id, hat: block, blocks });
+      }
+    }
+  }
+
+  return scripts;
+}
