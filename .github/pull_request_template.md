@@ -6,4 +6,4 @@
 2.
 3.
 
-## Notes for Reviewersz
+## Notes for Reviewers
