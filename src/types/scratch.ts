@@ -92,6 +92,7 @@ export interface BlockMutation {
  * Use `parseScripts()` from `lib/scratch.ts` to get traversed `Script` objects.
  */
 export interface Block {
+  id: string;
   opcode: Opcode;
   next: string | null; // ID of the block directly below this one in the stack
   parent: string | null; // ID of the block above, or the C-block wrapping this
