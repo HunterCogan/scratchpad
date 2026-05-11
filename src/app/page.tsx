@@ -4,6 +4,7 @@ import { Button } from "@heroui/react";
 import { CalculatorIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import MongoTest from "@/components/MongoTest";
+import { HamburgerMenu } from "@/components/navigation/navbar";
 
 export default function Home() {
   const [exampleNumber, setExampleNumber] = useState(0);
@@ -12,6 +13,8 @@ export default function Home() {
     <div className="flex flex-col flex-1 items-center justify-center font-sans">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center py-32 px-16 sm:items-start">
         <h1 className="text-4xl">Scratchpad</h1>
+
+        <HamburgerMenu />
 
         <p className="mt-6">
           This is an example for the landing page of Scratchpad. We will make

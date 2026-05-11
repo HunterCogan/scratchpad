@@ -14,10 +14,10 @@
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
-    "better-auth": "^1.6.9",
+    "better-auth": "^1.4.3",
     "mongodb": "^7.2.0",
     "mongoose": "^9.6.1",
-    "next": "16.2.5",
+    "next": "^16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
