@@ -5,12 +5,15 @@ A collaborative, AI-powered coding platform that lets students upload, edit, and
 ## Getting Started ( Dev )
 
 1. Install the project's dependancies.
+
 ```bash
 npm install
 ```
+
 2. IMPORTANT: Add .env, add "MONGODB_URI=" then contact me for the value.
 
 3. Then run the development server:
+
 ```bash
 npm run dev
 ```
