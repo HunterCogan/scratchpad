@@ -156,10 +156,9 @@ function collectBlocks(
     collected.push(block);
 
     // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
-    for (const [key] of Object.entries(block.inputs)) {
-      const result = getInputValue(block, key);
-      if (result.type === "block")
-        collectBlocks(result.blockId, blockMap, collected);
+    for (const input of Object.values(getAllInputValues(block))) {
+      if (input.type === "block")
+        collectBlocks(input.blockId, blockMap, collected);
     }
 
     currentId = block.next;
