@@ -167,23 +167,23 @@ function collectBlocks(
 }
 
 /**
- * Parses raw `project.json` text and returns every `Script` across all
- * targets (Stage + all Sprites) as a flat array.
+ * Parses raw `project.json` text and returns every `Script` grouped by target name.
  *
- * A Scratch project stores all blocks for every target in flat `BlockMap`
- * dictionaries. This function identifies
- * hat blocks (blocks with `topLevel: true`) as script entry points, then
- * reconstructs each script by following `next` chains and recursing into
- * C-block bodies via `collectBlocks`.
+ * ```ts
+ * const scripts = parseScripts(raw)
+ * scripts['Cat1'] // Script[] for the Cat1 sprite
+ * scripts['Stage'] // Script[] for the Stage
+ * ```
  *
  * @param raw - The full text content of a Scratch `project.json` file.
- * @returns - A flat array of `Script` objects, one per hat block in the project.
+ * @returns A record mapping each target name to its array of `Script` objects.
  */
-export function parseScripts(raw: string): Script[] {
+export function parseScripts(raw: string): Record<string, Script[]> {
   const project: ScratchProject = JSON.parse(raw);
-  const scripts: Script[] = [];
+  const result: Record<string, Script[]> = {};
 
   for (const target of project.targets) {
+    const scripts: Script[] = [];
     for (const [id, block] of Object.entries(target.blocks)) {
       if (block.topLevel && !block.shadow) {
         const blocks: Block[] = [];
@@ -191,7 +191,8 @@ export function parseScripts(raw: string): Script[] {
         scripts.push({ hatBlockId: id, hat: block, blocks });
       }
     }
+    result[target.name] = scripts;
   }
 
-  return scripts;
+  return result;
 }
