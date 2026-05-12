@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@heroui/react";
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,7 +9,7 @@ export function HamburgerMenu() {
   return (
     <nav>
       {/* Hamburger Button */}
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         className="
                 fixed top-4 left-4 z-50
@@ -46,7 +47,7 @@ export function HamburgerMenu() {
                     ${isOpen ? "-rotate-48 -translate-y-1" : ""}
                 `}
         />
-      </button>
+      </Button>
 
       {/* Sidebar */}
       <div

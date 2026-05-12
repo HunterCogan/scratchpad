@@ -1,5 +1,5 @@
 import { LoginPage } from "../login-page/login";
-import Signup from "../login-page/signup";
+import { Signup } from "../login-page/signup";
 
 export default function Page() {
   return (

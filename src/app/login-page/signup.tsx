@@ -1,4 +1,4 @@
-export default function Signup() {
+export function Signup() {
   return (
     <div className="bg-gray-900 min-h-screen flex items-center justify-center">
       <form className="bg-white p-8 rounded shadow-md w-full max-w-md">
