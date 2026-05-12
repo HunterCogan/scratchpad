@@ -1,0 +1,66 @@
+import type { Script, Block } from "@/types";
+import { BlockRow } from "./BlockRow";
+
+function computeIndents(blocks: Block[]): number[] {
+  const blockMap = new Map(blocks.map((b) => [b.id, b]));
+  const memo = new Map<string, number>();
+
+  function depth(block: Block): number {
+    if (memo.has(block.id)) return memo.get(block.id)!;
+    let result: number;
+    if (!block.parent) {
+      result = 0;
+    } else {
+      const parent = blockMap.get(block.parent);
+
+      // Sequential blocks (parent.next === block.id) have no nesting,
+      // so they have the same indent: depth(parent)
+      // Nested input (condition, operand, body, etc.) goes one deeper: depth(parent) + 1
+      result =
+        !parent || parent.next === block.id
+          ? depth(parent ?? block)
+          : depth(parent) + 1;
+    }
+    memo.set(block.id, result);
+    return result;
+  }
+
+  return blocks.map(depth);
+}
+
+// Determines if block would be rendered inline with the parent.
+function isBlockReporter(block: Block, blockMap: Map<string, Block>): boolean {
+  if (!block.parent) return false;
+  const parent = blockMap.get(block.parent);
+  // Block is inline if block is inside of parent (parent.next != block.id)
+  // but not a substack.
+  if (!parent || parent.next === block.id) return false;
+  const isSubstack =
+    parent.inputs["SUBSTACK"]?.[1] === block.id ||
+    parent.inputs["SUBSTACK2"]?.[1] === block.id;
+  return !isSubstack;
+}
+
+interface Props {
+  script: Script;
+}
+
+export function ScriptStack({ script }: Props) {
+  const { blocks } = script;
+  const blockMap = new Map(blocks.map((b) => [b.id, b]));
+  const indents = computeIndents(blocks);
+  return (
+    <div className="flex h-fit flex-col overflow-hidden rounded-lg shadow-lg">
+      {blocks.map((block, i) => {
+        return (
+          <BlockRow
+            key={`${script.hatBlockId}-${i}`}
+            block={block}
+            indent={indents[i]}
+            isReporter={isBlockReporter(block, blockMap)}
+          />
+        );
+      })}
+    </div>
+  );
+}

@@ -1,0 +1,97 @@
+import type { Block, ResolvedInput } from "@/types";
+import { getAllInputValues, getAllFieldValues } from "@/lib/scratch";
+import { ArrowUpIcon, CodeBracketSquareIcon } from "@heroicons/react/20/solid";
+
+const CATEGORY_COLORS: Record<string, string> = {
+  motion: "bg-blue-600",
+  looks: "bg-purple-500",
+  sound: "bg-fuchsia-500",
+  event: "bg-yellow-500",
+  control: "bg-amber-500",
+  sensing: "bg-cyan-500",
+  operator: "bg-green-500",
+  variables: "bg-orange-500",
+  data: "bg-orange-500",
+  procedures: "bg-rose-400",
+  argument: "bg-rose-300",
+};
+
+function parseOpcode(opcode: string): { category: string; action: string } {
+  const sep = opcode.indexOf("_");
+  if (sep === -1) return { category: "", action: opcode };
+  return { category: opcode.slice(0, sep), action: opcode.slice(sep + 1) };
+}
+
+function inputLabel(input: ResolvedInput): string | null {
+  switch (input.type) {
+    case "number":
+      return String(input.value);
+    case "string":
+      return `"${input.value}"`;
+    case "color":
+      return input.value;
+    case "broadcast":
+      return `@${input.name}`;
+    case "variable":
+    case "list":
+      return `(${input.name})`;
+    case "block":
+      return `[ ]`;
+    default:
+      return null;
+  }
+}
+
+interface Props {
+  block: Block;
+  indent: number;
+  isReporter: boolean;
+}
+
+export function BlockRow({ block, indent, isReporter }: Props) {
+  const { category, action } = parseOpcode(block.opcode);
+  const color = CATEGORY_COLORS[category] ?? "bg-gray-200";
+  const fields = getAllFieldValues(block);
+  const inputs = getAllInputValues(block);
+
+  // padding for line indent, made more visible the further indented
+  const padding = indent * 1.25;
+  const paddingOpacity = Math.min(Math.max(indent / 10, 0), 1);
+
+  return (
+    <div
+      className={`flex flex-wrap items-center gap-1.5 border-b border-black/25 pe-3 py-1.5 text-sm text-white last:border-b-0 ${color}`}
+    >
+      <span
+        style={{
+          width: `${padding}rem`,
+          height: `1rem`,
+          opacity: paddingOpacity,
+        }}
+        className="bg-white"
+      />
+      {block.topLevel && <CodeBracketSquareIcon className="size-3" />}
+      {isReporter && <ArrowUpIcon className="size-3" />}
+      <span className="font-mono font-semibold tracking-wide">{action}</span>
+      {Object.entries(fields).map(([k, v]) => (
+        <span
+          key={k}
+          className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs"
+        >
+          {v}
+        </span>
+      ))}
+      {Object.entries(inputs).map(([k, inp]) => {
+        const label = inputLabel(inp);
+        return label !== null ? (
+          <span
+            key={k}
+            className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs"
+          >
+            {label}
+          </span>
+        ) : null;
+      })}
+    </div>
+  );
+}
