@@ -1,5 +1,6 @@
 import type { Script, Block } from "@/types";
 import { BlockRow } from "./BlockRow";
+import { Card } from "@heroui/react";
 
 function computeIndents(blocks: Block[]): number[] {
   const blockMap = new Map(blocks.map((b) => [b.id, b]));
@@ -50,17 +51,19 @@ export function ScriptStack({ script }: Props) {
   const blockMap = new Map(blocks.map((b) => [b.id, b]));
   const indents = computeIndents(blocks);
   return (
-    <div className="flex h-fit flex-col overflow-hidden rounded-lg shadow-lg">
-      {blocks.map((block, i) => {
-        return (
-          <BlockRow
-            key={`${script.hatBlockId}-${i}`}
-            block={block}
-            indent={indents[i]}
-            isReporter={isBlockReporter(block, blockMap)}
-          />
-        );
-      })}
-    </div>
+    <Card className="w-fit h-fit rounded-md p-1" variant="default">
+      <Card.Content className="gap-0 overflow-hidden rounded-md">
+        {blocks.map((block, i) => {
+          return (
+            <BlockRow
+              key={`${script.hatBlockId}-${i}`}
+              block={block}
+              indent={indents[i]}
+              isReporter={isBlockReporter(block, blockMap)}
+            ></BlockRow>
+          );
+        })}
+      </Card.Content>
+    </Card>
   );
 }

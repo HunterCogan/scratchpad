@@ -1,5 +1,6 @@
 import type { Script } from "@/types";
 import { ScriptStack } from "./ScriptStack";
+import { Surface } from "@heroui/react";
 
 interface Props {
   scripts: Record<string, Script[]>;
@@ -18,10 +19,13 @@ export function ScriptView({ scripts, selectedTarget }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap justify-between gap-6 p-4 rounded-lg border-1">
+    <Surface
+      className="flex flex-wrap gap-3 p-3 justify-center  border-1 rounded-md"
+      variant="secondary"
+    >
       {targetScripts.map((script) => (
-        <ScriptStack key={script.hatBlockId} script={script} />
+        <ScriptStack key={script.hatBlockId} script={script}></ScriptStack>
       ))}
-    </div>
+    </Surface>
   );
 }

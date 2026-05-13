@@ -60,7 +60,7 @@ export function BlockRow({ block, indent, isReporter }: Props) {
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 border-b border-black/25 pe-3 py-1.5 text-sm text-white last:border-b-0 ${color}`}
+      className={`flex flex-wrap items-center gap-1.5 pe-1 py-1.5 text-sm text-white ${color}`}
     >
       <span
         style={{
