@@ -68,7 +68,7 @@ export function BlockRow({ block, indent, isReporter }: Props) {
           height: `1rem`,
           opacity: paddingOpacity,
         }}
-        className="bg-white"
+        className="bg-white rounded-e-md"
       />
       {block.topLevel && <CodeBracketSquareIcon className="size-3" />}
       {isReporter && <ArrowUpIcon className="size-3" />}
