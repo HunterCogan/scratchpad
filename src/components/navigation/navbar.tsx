@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/react";
+import Link from "next/link";
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,27 +14,27 @@ export function HamburgerMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="
                 fixed top-4 left-4 z-50
-                w-11 h-12
+                w-10 h-10
                 flex flex-col justify-center items-center
                 bg-gray-800 rounded-lg shadow-lg
                 hover:bg-gray-700 
-                transition-colors duration-300 ease-in-out
+                transition-colors duration-200 ease-in-out
                 cursor-pointer
             "
       >
         {/* Line 1 */}
         <span
           className={`
-                    block h-0.5 w-6 bg-white
+                    block h-0.5 w-5 bg-white
                     transition-all duration-500 ease-in-out
-                    ${isOpen ? "rotate-44 translate-y-2" : ""}
+                    ${isOpen ? "rotate-45 translate-y-2" : ""}
                 `}
         />
 
         {/* Line 2 */}
         <span
           className={`
-                    block h-0.5 w-6 bg-white my-1
+                    block h-0.5 w-5 bg-white my-0
                     transition-all duration-500 ease-in-out
                     ${isOpen ? "opacity-0" : "opacity-100"}
                 `}
@@ -42,14 +43,17 @@ export function HamburgerMenu() {
         {/* Line 3 */}
         <span
           className={`
-                    block h-0.5 w-6 bg-white
+                    block h-0.5 w-5 bg-white
                     transition-all duration-500 ease-in-out
-                    ${isOpen ? "-rotate-48 -translate-y-1" : ""}
+                    ${isOpen ? "-rotate-50 -translate-y-3" : ""}
                 `}
         />
       </Button>
 
       {/* Sidebar */}
+
+      {/* Header */}
+
       <div
         className={`
                     fixed
@@ -57,6 +61,7 @@ export function HamburgerMenu() {
                     left-0
                     h-screen
                     w-64
+                    z-40
                     bg-gray-800
                     p-6
                     shadow-2xl
@@ -67,29 +72,73 @@ export function HamburgerMenu() {
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 `}
       >
-        <ul className="flex flex-col gap-6 text-lg mt-14">
+        <h2 className="text-2xl  font-bold text-white mt-16 border-b border-gray-500 pb-2">
+          Scratchpad
+        </h2>
+
+        <ul className="flex flex-col gap-6 text-lg mt-9">
           <li>
-            <a href="/new" className="hover:text-blue-400">
+            <Link
+              href="/new"
+              className={`
+                text-lg 
+                text-white
+                hover:text-blue-400
+                transition-colors duration-300 
+                underline 
+                decoration-transparent 
+                hover:decoration-blue-400`}
+            >
               Dashboard
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/about" className="hover:text-blue-400">
+            <Link
+              href="/about"
+              className={`
+                text-lg 
+                text-white
+                hover:text-blue-400
+                transition-colors duration-300 
+                underline 
+                decoration-transparent 
+                hover:decoration-blue-400`}
+            >
               My Scratchpad
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/shared" className="hover:text-blue-400">
+            <Link
+              href="/shared"
+              className={`
+            text-lg 
+            text-white 
+            hover:text-blue-400 
+            transition-colors duration-300 
+            underline 
+            decoration-transparent 
+            hover:decoration-blue-400`}
+            >
               Shared With Me
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/settings" className="hover:text-blue-400">
+            <Link
+              href="/settings"
+              className={`
+            text-lg 
+            text-white 
+            hover:text-blue-400 
+            transition-colors duration-300 
+            underline 
+            decoration-transparent 
+            hover:decoration-blue-400`}
+            >
               Favorites
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
