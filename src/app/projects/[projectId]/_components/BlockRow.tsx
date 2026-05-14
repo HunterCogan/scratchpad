@@ -78,20 +78,14 @@ export function BlockRow({ block, indent, isReporter, lineNumber }: Props) {
       {isReporter && <ArrowUpIcon className="size-3" />}
       <span className="font-mono font-semibold tracking-wide">{action}</span>
       {Object.entries(fields).map(([k, v]) => (
-        <span
-          key={k}
-          className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs"
-        >
+        <span key={k} className="rounded bg-black/10 px-1 py-0.5 font-mono">
           {v}
         </span>
       ))}
       {Object.entries(inputs).map(([k, inp]) => {
         const label = inputLabel(inp);
         return label !== null ? (
-          <span
-            key={k}
-            className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs"
-          >
+          <span key={k} className="rounded bg-white/10 px-1 py-0.5 font-mono">
             {label}
           </span>
         ) : null;
