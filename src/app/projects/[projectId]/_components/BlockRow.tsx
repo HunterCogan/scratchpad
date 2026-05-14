@@ -46,9 +46,10 @@ interface Props {
   block: Block;
   indent: number;
   isReporter: boolean;
+  lineNumber: number;
 }
 
-export function BlockRow({ block, indent, isReporter }: Props) {
+export function BlockRow({ block, indent, isReporter, lineNumber }: Props) {
   const { category, action } = parseOpcode(block.opcode);
   const color = CATEGORY_COLORS[category] ?? "bg-gray-200";
   const fields = getAllFieldValues(block);
@@ -60,16 +61,19 @@ export function BlockRow({ block, indent, isReporter }: Props) {
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 pe-1 py-1.5 text-sm text-white ${color}`}
+      className={`flex flex-wrap items-center gap-1.5 px-1.5 py-1.5 text-sm text-white ${color}`}
     >
+      <span className="font-mono text-xs opacity-50 select-none">
+        {String(lineNumber).padStart(2, "0")}
+      </span>
       <span
         style={{
           width: `${padding}rem`,
           height: `1rem`,
           opacity: paddingOpacity,
         }}
-        className="bg-white rounded-e-md"
-      />
+        className="bg-white rounded-md"
+      ></span>
       {block.topLevel && <CodeBracketSquareIcon className="size-3" />}
       {isReporter && <ArrowUpIcon className="size-3" />}
       <span className="font-mono font-semibold tracking-wide">{action}</span>

@@ -50,6 +50,14 @@ export function ScriptStack({ script }: Props) {
   const { blocks } = script;
   const blockMap = new Map(blocks.map((b) => [b.id, b]));
   const indents = computeIndents(blocks);
+  const blockReporters = blocks.map((b) => isBlockReporter(b, blockMap));
+  // Line number increments on non-reporter blocks
+  const lineNumbers = blocks.reduce<number[]>((acc, block, i) => {
+    const prev = acc[i - 1] ?? 0;
+    acc.push(blockReporters[i] ? prev : prev + 1);
+    return acc;
+  }, []);
+
   return (
     <Card className="w-fit h-fit rounded-md p-1" variant="default">
       <Card.Content className="gap-0 overflow-hidden rounded-md">
@@ -59,7 +67,8 @@ export function ScriptStack({ script }: Props) {
               key={`${script.hatBlockId}-${i}`}
               block={block}
               indent={indents[i]}
-              isReporter={isBlockReporter(block, blockMap)}
+              isReporter={blockReporters[i]}
+              lineNumber={lineNumbers[i]}
             ></BlockRow>
           );
         })}
