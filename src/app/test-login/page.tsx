@@ -64,7 +64,7 @@ export default function LoginPage() {
 
       <div className="flex text-center text-sm mt-3">
         Do not have an account?{" "}
-        <Link href="/test-register" className="underline pl-2">
+        <Link href="/signup" className="underline pl-2">
           Register
         </Link>
       </div>

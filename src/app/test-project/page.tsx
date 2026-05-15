@@ -14,7 +14,7 @@ export default async function ProjectPage() {
     const cookieStore = await cookies();
     cookieStore.delete("better-auth.session_token");
     cookieStore.delete("__Secure-better-auth.session_token");
-    redirect("/test-login");
+    redirect("/login");
   }
 
   return (

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 // !!! make sure to update these once we have the pages
 const protectedRoutes = ["/test-dashboard", "/test-project"];
-const publicRoutes = ["/test-login", "/test-register"];
+const publicRoutes = ["/login", "/signup"];
 
 // proxy function that runs on each request to check auth state and redirects accordingly
 export function proxy(request: NextRequest) {
@@ -22,9 +22,8 @@ export function proxy(request: NextRequest) {
 
   const isAuthenticated = !!sessionCookie;
 
-  // !!! change to /login once that page is made
   if (isProtectedRoute && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/test-login", request.nextUrl));
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
   // !!! change to /dashboard once that page is made

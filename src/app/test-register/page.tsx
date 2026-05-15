@@ -104,7 +104,7 @@ export default function RegisterPage() {
 
       <div className="flex text-center text-sm mt-3">
         Already have an account?{" "}
-        <Link href="/test-login" className="underline pl-2">
+        <Link href="/login" className="underline pl-2">
           Login
         </Link>
       </div>
