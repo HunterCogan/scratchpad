@@ -61,7 +61,7 @@ export function BlockRow({ block, indent, isReporter, lineNumber }: Props) {
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 px-1.5 py-1.5 text-sm text-white ${color}`}
+      className={`flex flex-wrap items-center gap-1.5 p-1.5 text-sm text-white ${color}`}
     >
       <span className="font-mono text-xs opacity-50 select-none">
         {String(lineNumber).padStart(2, "0")}
