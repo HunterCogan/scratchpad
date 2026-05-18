@@ -36,6 +36,7 @@ const RemixSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      trim: true,
       minlength: [1, "Remix description must be atleast 1 character"],
       maxlength: [300, "Remix description cannot exceed 300 characters"],
     },

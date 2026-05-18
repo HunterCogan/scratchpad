@@ -10,6 +10,7 @@ export const ProjectSchema = z.object({
   description: z
     .string()
     .max(500, "Project description cannot exceed 500 characters")
+    .trim()
     .optional(),
   team: z.array(z.string()).optional(),
 });
