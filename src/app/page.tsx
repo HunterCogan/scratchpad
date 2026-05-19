@@ -8,7 +8,7 @@ export default async function Home() {
   });
 
   if (session?.user?.id) {
-    redirect("/test-dashboard");
+    redirect("/dashboard");
   } else {
     redirect("/test-login");
   }
