@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import {
   Button,
@@ -11,18 +10,19 @@ import {
   Input,
   Label,
   Modal,
+  Spinner,
   TextField,
   useOverlayState,
 } from "@heroui/react";
-import { handleCreateProject } from "../actions";
 import { ProjectSchema } from "@/lib/schemas/project.zod";
+import { useRouter } from "next/navigation";
 
 // Confirmation button that show on the Modal and submits the Form inputs
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ isPending }: { isPending?: boolean }) {
   return (
-    <Button type="submit" variant="primary" fullWidth isPending={pending}>
-      Create Project
+    <Button type="submit" variant="primary" fullWidth isPending={isPending}>
+      {isPending && <Spinner size="sm" />}
+      {isPending ? "Creating..." : "Create Project"}
     </Button>
   );
 }
@@ -30,9 +30,41 @@ function SubmitButton() {
 // Modal that contains the form for creating a new project. It is opened with the Create New Project button.
 export default function CreateProjectModal() {
   const state = useOverlayState();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitted(true);
+    if (!name.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description }),
+      });
+
+      if (res.ok) {
+        state.close();
+        router.push("/dashboard");
+      } else {
+        const { data } = await res.json();
+        setError(
+          typeof data.error == "string"
+            ? data.error
+            : "Failed to create project",
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <Modal state={state}>
@@ -51,12 +83,10 @@ export default function CreateProjectModal() {
             </Modal.Header>
             <Modal.Body>
               <Form
-                action={handleCreateProject}
                 className="flex flex-col gap-4 p-1"
                 validationBehavior="aria"
                 onSubmit={(e) => {
-                  setSubmitted(true);
-                  if (!name.trim()) e.preventDefault();
+                  handleSubmit(e);
                 }}
               >
                 <TextField
@@ -106,7 +136,9 @@ export default function CreateProjectModal() {
                   </Description>
                   <FieldError />
                 </TextField>
-                <SubmitButton />
+
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                <SubmitButton isPending={loading} />
               </Form>
             </Modal.Body>
           </Modal.Dialog>
