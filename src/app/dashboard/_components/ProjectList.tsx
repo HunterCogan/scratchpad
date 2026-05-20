@@ -6,11 +6,11 @@ import {
   Button,
   Card,
   Chip,
-  Form,
+  Spinner,
   useOverlayState,
 } from "@heroui/react";
 import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { handleDeleteProject } from "../actions";
+import { useState } from "react";
 
 type Project = {
   id: string;
@@ -29,6 +29,31 @@ function shortProjectId(id: string) {
 function ProjectRow({ project }: { project: Project }) {
   const router = useRouter();
   const deleteState = useOverlayState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/projects/${project.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        deleteState.close();
+        router.refresh();
+      } else {
+        const data = await res.json();
+        setError(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to delete project",
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <Card className="w-full items-stretch flex-row">
@@ -80,19 +105,18 @@ function ProjectRow({ project }: { project: Project }) {
                       deleted. This cannot be undone.
                     </AlertDialog.Body>
                     <AlertDialog.Footer>
+                      {error && <p className="text-sm text-red-500">{error}</p>}
                       <Button variant="outline" onPress={deleteState.close}>
                         Cancel
                       </Button>
-                      <Form action={handleDeleteProject}>
-                        <input
-                          type="hidden"
-                          name="projectId"
-                          value={project.id}
-                        />
-                        <Button type="submit" variant="danger">
-                          Delete
-                        </Button>
-                      </Form>
+                      <Button
+                        variant="danger"
+                        isDisabled={loading}
+                        onPress={handleDelete}
+                      >
+                        {loading && <Spinner size="sm" />}
+                        {loading ? "Deleting..." : "Delete"}
+                      </Button>
                     </AlertDialog.Footer>
                   </AlertDialog.Dialog>
                 </AlertDialog.Container>
