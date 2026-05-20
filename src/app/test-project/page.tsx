@@ -31,7 +31,7 @@ export default async function ProjectPage() {
         </div>
 
         <Button variant="primary" className="w-fit">
-          <Link href="/test-dashboard">Back to Dashboard</Link>
+          <Link href="/dashboard">Back to Dashboard</Link>
         </Button>
 
         <Form action={handleLogout}>
