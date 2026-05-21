@@ -17,8 +17,8 @@ export default function NavbarClient({ projects }: { projects: Project[] }) {
         href="/dashboard"
         className={`px-3 py-2 mb-2 rounded-md text-sm font-medium transition-colors ${
           pathname === "/dashboard"
-            ? "bg-slate-700 text-white"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-nav-item-active text-nav-text"
+            : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
         }`}
       >
         Dashboard
@@ -27,8 +27,8 @@ export default function NavbarClient({ projects }: { projects: Project[] }) {
         href="/shared-projects"
         className={`px-3 py-2 mb-2 rounded-md text-sm font-medium transition-colors ${
           pathname === "/shared-projects"
-            ? "bg-slate-700 text-white"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-nav-item-active text-nav-text"
+            : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
         }`}
       >
         Shared with me
@@ -37,16 +37,16 @@ export default function NavbarClient({ projects }: { projects: Project[] }) {
         href="/favorites"
         className={`px-3 py-2 mb-2 rounded-md text-sm font-medium transition-colors ${
           pathname === "/favorites"
-            ? "bg-slate-700 text-white"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-nav-item-active text-nav-text"
+            : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
         }`}
       >
         Favorites
       </Link>
 
       {projects.length > 0 && (
-        <div className="mt-10 border-t border-slate-700 pt-4">
-          <p className="px-3 mb-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        <div className="mt-10 border-t border-nav-border pt-4">
+          <p className="px-3 mb-1 text-xs font-semibold text-nav-text-subtle uppercase tracking-wider">
             Recent Projects
           </p>
           {projects.map((p) => (
@@ -55,8 +55,8 @@ export default function NavbarClient({ projects }: { projects: Project[] }) {
               href={`/projects/${p.id}`}
               className={`block px-3 py-1.5 rounded-md text-sm truncate transition-colors ${
                 pathname === `/projects/${p.id}`
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  ? "bg-nav-item-active text-nav-text"
+                  : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
               }`}
             >
               {p.name}

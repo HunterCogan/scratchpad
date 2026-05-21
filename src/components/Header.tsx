@@ -6,7 +6,7 @@ export default async function Header() {
   const { name } = await verifySession();
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 border-b border-slate-700 bg-slate-900 z-30">
+    <header className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 border-b border-nav-border bg-nav-surface z-30">
       <Link href="/dashboard" className="text-2xl text-slate-200 font-bold">
         Scratchpad
       </Link>

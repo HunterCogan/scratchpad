@@ -52,7 +52,7 @@ export default function CreateProjectModal() {
 
       if (res.ok) {
         state.close();
-        router.push("/dashboard");
+        router.refresh();
       } else {
         const { data } = await res.json();
         setError(
