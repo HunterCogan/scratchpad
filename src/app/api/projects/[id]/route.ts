@@ -4,6 +4,42 @@ import connectDB from "@/lib/db";
 import Project from "@/models/Project";
 import mongoose from "mongoose";
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Project ID is required" },
+        { status: 400 },
+      );
+    }
+
+    const session = await verifySession();
+    await connectDB();
+
+    const project = await Project.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+      creator: new mongoose.Types.ObjectId(session.userId),
+    });
+
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ project }, { status: 200 });
+  } catch (error) {
+    console.error("Get project error:", error);
+    return NextResponse.json(
+      { error: "Failed to get project" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

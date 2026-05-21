@@ -9,7 +9,7 @@ import {
   ListBox,
 } from "@heroui/react";
 import { useState } from "react";
-import { ScriptView } from "@/app/projects/[projectId]/_components/ScriptView";
+import { ScriptView } from "@/app/projects/[id]/_components/ScriptView";
 import { parseScripts } from "@/lib/scratch";
 import { Script } from "@/types";
 
