@@ -153,10 +153,11 @@ function collectBlocks(
     const block = blockMap[currentId];
     if (!block) break;
 
-    collected.push(block);
+    const stamped = { ...block, id: currentId };
+    collected.push(stamped);
 
     // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
-    for (const input of Object.values(getAllInputValues(block))) {
+    for (const input of Object.values(getAllInputValues(stamped))) {
       if (input.type === "block")
         collectBlocks(input.blockId, blockMap, collected);
     }
@@ -187,7 +188,7 @@ export function parseScripts(raw: string): Record<string, Script[]> {
       if (block.topLevel && !block.shadow) {
         const blocks: Block[] = [];
         collectBlocks(id, target.blocks, blocks);
-        scripts.push({ hatBlockId: id, hat: block, blocks });
+        scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
       }
     }
     result[target.name] = scripts;

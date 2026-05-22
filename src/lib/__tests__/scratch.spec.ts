@@ -14,6 +14,7 @@ import type { Block } from "@/types";
 // Helpers
 function makeBlock(overrides: Partial<Block> = {}): Block {
   return {
+    id: "test-block",
     opcode: "motion_movesteps",
     next: null,
     parent: null,
