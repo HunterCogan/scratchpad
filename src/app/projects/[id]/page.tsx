@@ -5,6 +5,7 @@ import Remix from "@/models/Remix";
 import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import CreateRemixModal from "./_components/CreateRemixModal";
+import { Card } from "@heroui/react";
 
 export default async function ProjectPage({
   params,
@@ -25,6 +26,7 @@ export default async function ProjectPage({
 
   const remixes = await Remix.find({ project: project._id })
     .sort({ createdAt: -1 })
+    .populate("uploader", "name")
     .lean();
 
   return (
@@ -44,23 +46,16 @@ export default async function ProjectPage({
           {remixes.length === 0 ? (
             <p className="text-sm text-gray-400">No remixes yet.</p>
           ) : (
-            <ul className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               {remixes.map((remix) => (
-                <li
-                  key={remix._id.toString()}
-                  className="flex flex-col gap-1 border border-gray-700 rounded-md p-3"
-                >
-                  <p className="text-sm">{remix.description}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(remix.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </p>
-                </li>
+                <Card key={remix._id}>
+                  <Card.Header>
+                    <Card.Title>{remix.uploader.name}</Card.Title>
+                    <Card.Description>{remix.description}</Card.Description>
+                  </Card.Header>
+                </Card>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </main>

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import "@/models/User";
 
 const ProjectSchema = new mongoose.Schema(
   {

@@ -5,6 +5,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import {
   Button,
   Description,
+  ErrorMessage,
   FieldError,
   Form,
   Input,
@@ -36,7 +37,7 @@ export default function CreateRemixModal({ projectId }: { projectId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     setSubmitted(true);
     if (!description.trim() || !projectData.trim()) return;
@@ -67,16 +68,16 @@ export default function CreateRemixModal({ projectId }: { projectId: string }) {
 
   return (
     <Modal state={state}>
-      <Button variant="primary">
-        <PlusIcon className="h-4 w-4" />
+      <Button>
+        <PlusIcon />
         New Remix
       </Button>
-      <Modal.Backdrop>
-        <Modal.Container size="md">
+      <Modal.Backdrop variant="blur">
+        <Modal.Container>
           <Modal.Dialog>
-            <Modal.CloseTrigger className="m-2" />
+            <Modal.CloseTrigger />
             <Modal.Header>
-              <Modal.Heading className="text-2xl">New Remix</Modal.Heading>
+              <Modal.Heading>New Remix</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
               <Form
@@ -132,8 +133,7 @@ export default function CreateRemixModal({ projectId }: { projectId: string }) {
                   </Description>
                   <FieldError />
                 </TextField>
-
-                {error && <p className="text-sm text-red-500">{error}</p>}
+                <ErrorMessage>{error}</ErrorMessage>
                 <SubmitButton isPending={loading} />
               </Form>
             </Modal.Body>
