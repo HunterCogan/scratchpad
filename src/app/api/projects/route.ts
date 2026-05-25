@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       project: project._id,
       uploader: new mongoose.Types.ObjectId(session.userId),
       name: "main",
-      description: "initial mix",
+      description: "Hello, world!",
       isMain: true,
       files: [
         {

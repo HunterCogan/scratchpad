@@ -39,6 +39,7 @@ export async function POST(
       project: true,
       uploader: true,
     }).safeParse({
+      name: body.name,
       description: body.description,
     });
 
