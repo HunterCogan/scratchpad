@@ -1,6 +1,26 @@
 import mongoose from "mongoose";
+import "@/models/User";
 
-const ProgramFileSchema = new mongoose.Schema(
+export interface IProgramFile {
+  name: string;
+  fileType: "asset" | "logic";
+  data?: string;
+  imagePath?: string;
+}
+
+export interface IRemix {
+  project: mongoose.Types.ObjectId;
+  uploader: mongoose.Types.ObjectId;
+  name: string;
+  description: string;
+  isMain: boolean;
+  parents: mongoose.Types.ObjectId[];
+  files: IProgramFile[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ProgramFileSchema = new mongoose.Schema<IProgramFile>(
   {
     name: {
       type: String,
@@ -9,7 +29,7 @@ const ProgramFileSchema = new mongoose.Schema(
     fileType: {
       type: String,
       required: true,
-      enum: ["image", "logic"],
+      enum: ["asset", "logic"],
     },
     data: {
       type: String,
@@ -21,7 +41,7 @@ const ProgramFileSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const RemixSchema = new mongoose.Schema(
+const RemixSchema = new mongoose.Schema<IRemix>(
   {
     project: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,6 +52,13 @@ const RemixSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: [1, "Remix name must be atleast 1 character"],
+      maxlength: [200, "Remix name cannot exceed 200 characters"],
     },
     description: {
       type: String,
@@ -60,4 +87,5 @@ RemixSchema.index({ project: 1 });
 RemixSchema.index({ uploader: 1 });
 RemixSchema.index({ createdAt: -1 });
 
-export default mongoose.models.Remix || mongoose.model("Remix", RemixSchema);
+export default (mongoose.models.Remix as mongoose.Model<IRemix>) ||
+  mongoose.model<IRemix>("Remix", RemixSchema);

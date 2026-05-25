@@ -15,6 +15,19 @@ export const auth = betterAuth({
   // Use MongoDB adapter with the connected client's database
   database: mongodbAdapter(client.db()),
   secret: authSecret,
+  user: {
+    additionalFields: {
+      color: {
+        type: "string",
+        required: false,
+        defaultValue: () =>
+          "#" +
+          Math.floor(Math.random() * 0xffffff)
+            .toString(16)
+            .padStart(6, "0"),
+      },
+    },
+  },
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   basePath: "/api/auth",
 
