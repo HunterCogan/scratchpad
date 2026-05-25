@@ -39,7 +39,7 @@ export default async function DashboardPage() {
           </div>
           <CreateProjectModal />
         </div>
-        <ProjectList projects={serialized} />
+        <ProjectList projects={serialized} userId={session.userId} />
       </main>
       <div className="fixed bottom-5 right-5">
         <LogoutButton />

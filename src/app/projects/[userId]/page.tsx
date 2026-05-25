@@ -11,17 +11,20 @@ import CreateRemixModal from "./_components/CreateRemixModal";
 
 export default async function ProjectPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ userId: string }>;
+  searchParams: Promise<{ projectId?: string }>;
 }) {
-  const { id } = await params;
+  const { userId } = await params;
+  const { projectId } = await searchParams;
 
-  const session = await verifySession();
+  await verifySession();
   await connectDB();
 
   const project = await ProjectModel.findOne({
-    _id: new mongoose.Types.ObjectId(id),
-    creator: new mongoose.Types.ObjectId(session.userId),
+    _id: new mongoose.Types.ObjectId(projectId),
+    creator: new mongoose.Types.ObjectId(userId),
   }).lean();
 
   if (!project) notFound();
@@ -60,7 +63,7 @@ export default async function ProjectPage({
             <Avatar>
               <Avatar.Fallback>AC</Avatar.Fallback>
             </Avatar>
-            <CreateRemixModal projectId={id} />
+            <CreateRemixModal projectId={project._id.toString()} />
           </div>
         </div>
         <Separator></Separator>
