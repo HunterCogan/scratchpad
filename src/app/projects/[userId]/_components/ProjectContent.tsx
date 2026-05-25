@@ -115,7 +115,7 @@ export function ProjectContent({ remixes }: Props) {
             </Card.Description>
           </Card.Header>
           <Card.Content className="">
-            <ScrollShadow className="h-[60px]">
+            <ScrollShadow className="h-15">
               {selectedRemix?.description}
             </ScrollShadow>
           </Card.Content>

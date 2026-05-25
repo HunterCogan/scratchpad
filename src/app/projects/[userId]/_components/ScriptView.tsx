@@ -20,7 +20,7 @@ export function ScriptView({ scripts, selectedTarget }: Props) {
 
   return (
     <Surface
-      className="flex flex-wrap gap-3 p-3 justify-around flex-1 min-h-0 overflow-auto bg-grid border-1 rounded-lg"
+      className="flex flex-wrap gap-3 p-3 justify-around flex-1 min-h-0 overflow-auto bg-grid border rounded-lg"
       variant="transparent"
     >
       {targetScripts.map((script) => (
