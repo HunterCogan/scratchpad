@@ -76,20 +76,25 @@ export default async function ProjectPage({
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <Avatar>
-                <Avatar.Fallback>
-                  {creator?.name?.substring(0, 2)}
-                </Avatar.Fallback>
-              </Avatar>
+            <div className="flex flex-row">
               {project.team.map((member) => (
-                <Avatar key={member._id.toString()}>
+                <Avatar
+                  key={member._id.toString()}
+                  className="-mr-4 border-2 border-white"
+                >
                   <Avatar.Fallback>
                     {member.name.substring(0, 2)}
                   </Avatar.Fallback>
                 </Avatar>
               ))}
-              <AddCollaboratorModal projectId={project._id.toString()} />
+              <Avatar className="border-2 border-white">
+                <Avatar.Fallback>
+                  {creator?.name?.substring(0, 2)}
+                </Avatar.Fallback>
+              </Avatar>
+              <span className="ml-2">
+                <AddCollaboratorModal projectId={project._id.toString()} />
+              </span>
             </div>
             <CreateRemixModal projectId={project._id.toString()} />
           </div>
