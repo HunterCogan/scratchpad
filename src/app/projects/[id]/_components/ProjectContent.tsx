@@ -11,13 +11,9 @@ import {
   Separator,
 } from "@heroui/react";
 import { parseScripts } from "@/lib/scratch";
-import CreateRemixModal from "./CreateRemixModal";
 import { ScriptsPanel } from "./ScriptsPanel";
-import {
-  EyeIcon,
-  ArrowDownTrayIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { EyeIcon } from "@heroicons/react/24/solid";
 
 export type RemixItem = {
   id: string;
@@ -30,11 +26,10 @@ export type RemixItem = {
 };
 
 interface Props {
-  projectId: string;
   remixes: RemixItem[];
 }
 
-export function ProjectContent({ projectId, remixes }: Props) {
+export function ProjectContent({ remixes }: Props) {
   const defaultId = (remixes.find((r) => r.isMain) ?? remixes[0])?.id ?? null;
   const [selectedId, setSelectedId] = useState<string | null>(defaultId);
 
@@ -56,7 +51,6 @@ export function ProjectContent({ projectId, remixes }: Props) {
         hideScrollBar
       >
         <h2 className="text-lg font-semibold">Remixes</h2>
-        <CreateRemixModal projectId={projectId} />
         {remixes.length === 0 ? (
           <p className="text-sm text-gray-400">No remixes yet.</p>
         ) : (
@@ -90,8 +84,8 @@ export function ProjectContent({ projectId, remixes }: Props) {
                 <Card.Footer>
                   <Button
                     variant="outline"
-                    size="sm"
                     onPress={() => setSelectedId(remix.id)}
+                    fullWidth
                   >
                     <EyeIcon />
                     View
@@ -111,7 +105,10 @@ export function ProjectContent({ projectId, remixes }: Props) {
             <Card.Title>About this Remix</Card.Title>
             <Card.Description>
               Created {selectedRemix?.createdAt} by{" "}
-              <Link href="#">{selectedRemix?.uploaderName}</Link>
+              <Link href="#">
+                @{selectedRemix?.uploaderName}
+                <Link.Icon></Link.Icon>
+              </Link>
             </Card.Description>
           </Card.Header>
           <Card.Content className="flex flex-row gap-2 items-center">
