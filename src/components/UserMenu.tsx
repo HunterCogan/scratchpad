@@ -2,22 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button, Form } from "@heroui/react";
+import { Avatar, Button, Form } from "@heroui/react";
 import { logout } from "@/lib/actions/auth";
 
-export default function UserMenu({ name }: { name: string }) {
+export default function UserMenu({
+  name,
+  color,
+}: {
+  name: string;
+  color: string | undefined;
+}) {
   const [open, setOpen] = useState(false);
   // temporary solution to get the first initial char of the user
-  const initial = name.charAt(0).toUpperCase();
+  const initial = name.substring(0, 2).toUpperCase();
 
   return (
     <div className="relative">
-      <Button
-        onClick={() => setOpen((o) => !o)}
-        className="w-9 h-9 bg-violet-800 text-white text-lg font-semibold flex items-center justify-center cursor-pointer select-none tracking-tighter"
-      >
-        <span className="-ml-0.75">{initial}</span>
-      </Button>
+      <button onClick={() => setOpen((o) => !o)}>
+        <Avatar>
+          <Avatar.Fallback style={{ backgroundColor: color }}>
+            {initial}
+          </Avatar.Fallback>
+        </Avatar>
+      </button>
 
       {open && (
         <>

@@ -6,14 +6,14 @@ import mongoose from "mongoose";
 export interface IUser {
   name: string;
   email: string;
-  color?: string | null;
+  color: string;
 }
 
 const UserSchema = new mongoose.Schema<IUser>(
   {
     name: String,
     email: String,
-    color: { type: String, default: null },
+    color: { type: String, default: "#808080" },
   },
   { collection: "user" }, // Better Auth's default collection name
 );
