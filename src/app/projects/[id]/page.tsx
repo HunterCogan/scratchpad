@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import type { ProgramFile } from "@/lib/schemas/remix.zod";
+import { Separator } from "@heroui/react";
 
 export default async function ProjectPage({
   params,
@@ -52,6 +53,7 @@ export default async function ProjectPage({
             <p className="text-sm text-gray-400">{project.description}</p>
           )}
         </div>
+        <Separator></Separator>
         <ProjectContent projectId={id} remixes={serializedRemixes} />
       </main>
     </div>

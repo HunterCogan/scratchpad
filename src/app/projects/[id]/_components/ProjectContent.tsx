@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, Card, Chip, Link, ScrollShadow } from "@heroui/react";
+import {
+  Button,
+  Card,
+  Chip,
+  Link,
+  ScrollShadow,
+  Separator,
+} from "@heroui/react";
 import { parseScripts } from "@/lib/scratch";
 import CreateRemixModal from "./CreateRemixModal";
 import { ScriptsPanel } from "./ScriptsPanel";
@@ -88,6 +95,7 @@ export function ProjectContent({ projectId, remixes }: Props) {
           </div>
         )}
       </ScrollShadow>
+      <Separator orientation="vertical"></Separator>
       <div className="flex-1 min-w-0 flex flex-col gap-3 p-2">
         <h2 className="text-lg font-semibold">Remix Title</h2>
         <ScriptsPanel scripts={scripts} />
