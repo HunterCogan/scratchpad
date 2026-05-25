@@ -8,6 +8,7 @@ import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import type { ProgramFile } from "@/lib/schemas/remix.zod";
 import { Avatar, Separator } from "@heroui/react";
 import CreateRemixModal from "./_components/CreateRemixModal";
+import { BackButton } from "../../../components/BackButton";
 
 export default async function ProjectPage({
   params,
@@ -53,6 +54,7 @@ export default async function ProjectPage({
     <div className="font-sans h-screen flex flex-col overflow-hidden">
       <main className="px-6 py-8 flex flex-col gap-6 flex-1 min-h-0">
         <div className="flex flex-row gap-2 justify-between">
+          <BackButton href="/dashboard" />
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold">{project.name}</h1>
             {project.description && (
@@ -60,9 +62,11 @@ export default async function ProjectPage({
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <Avatar>
-              <Avatar.Fallback>AC</Avatar.Fallback>
-            </Avatar>
+            <div>
+              <Avatar>
+                <Avatar.Fallback>AC</Avatar.Fallback>
+              </Avatar>
+            </div>
             <CreateRemixModal projectId={project._id.toString()} />
           </div>
         </div>
