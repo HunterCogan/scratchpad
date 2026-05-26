@@ -80,7 +80,7 @@ export function ProjectContent({ remixes }: Props) {
                       <div className="w-2 h-2 rounded-full bg-green-500 self-center shrink-0" />
                     )}
                   </Card.Title>
-                  <Card.Description>{remix.createdAt}</Card.Description>
+                  <Card.Description>Created {remix.createdAt}</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-row gap-2 items-center">
                   <Avatar size="sm">
@@ -128,7 +128,24 @@ export function ProjectContent({ remixes }: Props) {
             </ScrollShadow>
           </Card.Content>
           <Card.Footer className="flex gap-2">
-            <Button size="sm">
+            <Button
+              size="sm"
+              onPress={() => {
+                if (!selectedRemix) return;
+                // Store project.json of selectedRemix as raw binary data
+                // then create a URL to point to this data to download it
+                const blob = new Blob([selectedRemix.projectJsonData], {
+                  type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                // link element with "download" required for download
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "project.json";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
               <ArrowDownTrayIcon />
               Download
             </Button>

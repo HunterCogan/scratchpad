@@ -11,6 +11,18 @@ import CreateRemixModal from "./_components/CreateRemixModal";
 import { BackButton } from "../../../components/BackButton";
 import AddCollaboratorModal from "./_components/AddCollaboratorModal";
 
+function formatTimestamp(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return `${Math.floor(days / 7)}w ago`;
+}
+
 export default async function ProjectPage({
   params,
   searchParams,
@@ -57,13 +69,7 @@ export default async function ProjectPage({
     isMain: remix.isMain,
     projectJsonData:
       remix.files.find((f: IProgramFile) => f.fileType === "logic")?.data ?? "",
-    createdAt: remix.createdAt.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }),
+    createdAt: formatTimestamp(remix.createdAt),
   }));
 
   return (
@@ -74,9 +80,7 @@ export default async function ProjectPage({
             <BackButton href="/dashboard" />
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold">{project.name}</h1>
-              {project.description && (
-                <p className="text-sm text-gray-400">{project.description}</p>
-              )}
+              {project.description}
               <div className="flex flex-row gap-2 my-2">
                 <Chip>
                   Created:{" "}
@@ -88,14 +92,7 @@ export default async function ProjectPage({
                 </Chip>
                 {remixes[0] ? (
                   <Chip>
-                    Updated:{" "}
-                    {remixes[0].createdAt.toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                    Updated: {serializedRemixes[0]?.createdAt ?? "Never"}
                   </Chip>
                 ) : (
                   <></>

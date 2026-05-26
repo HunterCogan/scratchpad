@@ -47,14 +47,33 @@ export default function CreateRemixModal({
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     setSubmitted(true);
-    if (!description.trim() || !projectData.trim()) return;
 
     setLoading(true);
     try {
+      // Remove metadata (device identifiable information)
+      // from project.json before sending to /remixes POST route,
+      // important because users can download files from other users
+      let sanitizedData = projectData;
+      try {
+        const parsed = JSON.parse(projectData);
+        if (parsed.meta) {
+          parsed.meta.vm = "0.0.0";
+          parsed.meta.agent = "";
+        }
+        sanitizedData = JSON.stringify(parsed);
+      } catch {
+        // No metadata found
+      }
+
       const res = await fetch(`/api/projects/${projectId}/remixes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, projectData, creatorId }),
+        body: JSON.stringify({
+          name,
+          description,
+          projectData: sanitizedData,
+          creatorId,
+        }),
       });
 
       if (res.ok) {
