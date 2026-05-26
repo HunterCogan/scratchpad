@@ -80,7 +80,7 @@ export function ProjectContent({ remixes }: Props) {
                       <div className="w-2 h-2 rounded-full bg-green-500 self-center shrink-0" />
                     )}
                   </Card.Title>
-                  <Card.Description>{remix.createdAt}</Card.Description>
+                  <Card.Description>Created {remix.createdAt}</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-row gap-2 items-center">
                   <Avatar size="sm">

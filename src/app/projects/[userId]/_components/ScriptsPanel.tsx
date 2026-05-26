@@ -26,7 +26,7 @@ export function ScriptsPanel({ scripts }: Props) {
     <div className="flex flex-col gap-4 flex-1 min-h-0">
       <ComboBox
         className="w-fit"
-        defaultInputValue={Object.keys(scripts)[0]}
+        inputValue={selectedTarget}
         onInputChange={(value) => setSelectedTarget(value)}
       >
         <Label>Selected Target</Label>
