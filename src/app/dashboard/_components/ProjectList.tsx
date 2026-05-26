@@ -26,7 +26,7 @@ function shortProjectId(id: string) {
 
 // A List of all the projects for a user. Has View button which goes to the project page,
 // and Delete button which opens a confirmation dialog before deleting the project.
-function ProjectRow({ project }: { project: Project }) {
+function ProjectRow({ project, userId }: { project: Project; userId: string }) {
   const router = useRouter();
   const deleteState = useOverlayState();
   const [loading, setLoading] = useState(false);
@@ -76,7 +76,9 @@ function ProjectRow({ project }: { project: Project }) {
             <Button
               variant="outline"
               size="sm"
-              onPress={() => router.push(`/projects/${project.id}`)}
+              onPress={() =>
+                router.push(`/projects/${userId}?projectId=${project.id}`)
+              }
             >
               <EyeIcon className="h-4 w-4" />
               View
@@ -129,7 +131,13 @@ function ProjectRow({ project }: { project: Project }) {
   );
 }
 
-export default function ProjectList({ projects }: { projects: Project[] }) {
+export default function ProjectList({
+  projects,
+  userId,
+}: {
+  projects: Project[];
+  userId: string;
+}) {
   if (projects.length === 0) {
     return (
       <p className="text-sm">No Projects yet. Create one to get started.</p>
@@ -139,7 +147,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
   return (
     <div className="flex flex-col gap-3">
       {projects.map((p) => (
-        <ProjectRow key={p.id} project={p} />
+        <ProjectRow key={p.id} project={p} userId={userId} />
       ))}
     </div>
   );
