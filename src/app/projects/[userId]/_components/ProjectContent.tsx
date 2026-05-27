@@ -38,6 +38,7 @@ export function ProjectContent({ remixes }: Props) {
 
   const scripts = useMemo(() => {
     if (!selectedRemix?.projectJsonData) return {};
+    console.log(selectedRemix.projectJsonData);
     try {
       return parseScripts(selectedRemix.projectJsonData);
     } catch {
@@ -109,8 +110,7 @@ export function ProjectContent({ remixes }: Props) {
       </ScrollShadow>
       <Separator orientation="vertical"></Separator>
       <div className="flex-1 min-w-0 flex flex-col gap-3 p-2">
-        {/* <h2 className="text-lg font-semibold">{selectedRemix?.name}</h2> */}
-        <ScriptsPanel scripts={scripts} />
+        <ScriptsPanel raw={selectedRemix?.projectJsonData} scripts={scripts} />
         <Card variant="secondary">
           <Card.Header>
             <Card.Title>About this Remix</Card.Title>
