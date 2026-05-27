@@ -38,7 +38,6 @@ export function ProjectContent({ remixes }: Props) {
 
   const scripts = useMemo(() => {
     if (!selectedRemix?.projectJsonData) return {};
-    console.log(selectedRemix.projectJsonData);
     try {
       return parseScripts(selectedRemix.projectJsonData);
     } catch {
