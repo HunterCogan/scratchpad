@@ -5,7 +5,6 @@ import User from "@/models/User";
 
 export default async function Header() {
   const { name, userId } = await verifySession();
-
   const user = await User.findById(userId).lean();
 
   return (

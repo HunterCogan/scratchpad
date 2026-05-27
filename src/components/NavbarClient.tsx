@@ -1,15 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type Project = {
   id: string;
   name: string;
 };
 
-export default function NavbarClient({ projects }: { projects: Project[] }) {
+export default function NavbarClient({
+  projects,
+  userId,
+}: {
+  projects: Project[];
+  userId: string;
+}) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeProjectId = searchParams.get("projectId");
 
   return (
     <nav className="flex flex-col p-3 h-full">
@@ -52,9 +60,9 @@ export default function NavbarClient({ projects }: { projects: Project[] }) {
           {projects.map((p) => (
             <Link
               key={p.id}
-              href={`/projects/${p.id}`}
+              href={`/projects/${userId}?projectId=${p.id}`}
               className={`block px-3 py-1.5 rounded-md text-sm truncate transition-colors ${
-                pathname === `/projects/${p.id}`
+                pathname === `/projects/${userId}` && activeProjectId === p.id
                   ? "bg-nav-item-active text-nav-text"
                   : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
               }`}
