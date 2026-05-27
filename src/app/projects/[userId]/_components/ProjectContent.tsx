@@ -109,51 +109,51 @@ export function ProjectContent({ remixes }: Props) {
       </ScrollShadow>
       <Separator orientation="vertical"></Separator>
       <div className="flex-1 min-w-0 flex flex-col gap-3 p-2">
-        <h2 className="text-lg font-semibold">{selectedRemix?.name}</h2>
+        {/* <h2 className="text-lg font-semibold">{selectedRemix?.name}</h2> */}
         <ScriptsPanel scripts={scripts} />
         <Card variant="secondary">
           <Card.Header>
             <Card.Title>About this Remix</Card.Title>
             <Card.Description>
-              Created {selectedRemix?.createdAt} by{" "}
+              {selectedRemix?.name} created {selectedRemix?.createdAt} by{" "}
               <Link href="#">
                 @{selectedRemix?.uploaderName}
                 <Link.Icon></Link.Icon>
               </Link>
             </Card.Description>
           </Card.Header>
-          <Card.Content className="">
+          <Card.Content className="flex flex-row justify-between">
             <ScrollShadow className="h-15">
               {selectedRemix?.description}
             </ScrollShadow>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onPress={() => {
+                  if (!selectedRemix) return;
+                  // Store project.json of selectedRemix as raw binary data
+                  // then create a URL to point to this data to download it
+                  const blob = new Blob([selectedRemix.projectJsonData], {
+                    type: "application/json",
+                  });
+                  const url = URL.createObjectURL(blob);
+                  // link element with "download" required for download
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "project.json";
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                <ArrowDownTrayIcon />
+                Download
+              </Button>
+              <Button variant="danger" size="sm">
+                <TrashIcon className="h-4 w-4" />
+                Delete
+              </Button>
+            </div>
           </Card.Content>
-          <Card.Footer className="flex gap-2">
-            <Button
-              size="sm"
-              onPress={() => {
-                if (!selectedRemix) return;
-                // Store project.json of selectedRemix as raw binary data
-                // then create a URL to point to this data to download it
-                const blob = new Blob([selectedRemix.projectJsonData], {
-                  type: "application/json",
-                });
-                const url = URL.createObjectURL(blob);
-                // link element with "download" required for download
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "project.json";
-                a.click();
-                URL.revokeObjectURL(url);
-              }}
-            >
-              <ArrowDownTrayIcon />
-              Download
-            </Button>
-            <Button variant="danger" size="sm">
-              <TrashIcon className="h-4 w-4" />
-              Delete
-            </Button>
-          </Card.Footer>
         </Card>
       </div>
     </div>

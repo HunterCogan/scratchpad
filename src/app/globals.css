@@ -2,16 +2,16 @@
 @import "@heroui/styles";
 
 :root {
-  --background: #F1F5F9;
-  --foreground: #0F172A;
+  --background: #f1f5f9;
+  --foreground: #0f172a;
 
   /* nav/header */
-  --nav-surface: #FFFFFF;
-  --nav-border: #E2E8F0;
-  --nav-text: #1E293B;
-  --nav-text-subtle: #94A3B8;
-  --nav-item-hover: #F1F5F9;
-  --nav-item-active: #E2E8F0;
+  --nav-surface: #ffffff;
+  --nav-border: #e2e8f0;
+  --nav-text: #1e293b;
+  --nav-text-subtle: #94a3b8;
+  --nav-item-hover: #f1f5f9;
+  --nav-item-active: #e2e8f0;
 }
 
 @theme inline {
