@@ -88,7 +88,7 @@ export default function Signup() {
           className="p-10 rounded-2xl justify-center shadow-xl w-full max-w-md gap-6 flex flex-col"
         >
           <TextField className="flex flex-col gap-1" isRequired>
-            <Label> Email </Label>
+            <Label>Email</Label>
 
             <Input
               type="email"
@@ -100,7 +100,7 @@ export default function Signup() {
           </TextField>
 
           <TextField className="flex flex-col gap-1" isRequired>
-            <Label> Password </Label>
+            <Label>Password</Label>
             <div className="relative w-full">
               <Input
                 type={showPassword ? "text" : "password"}
@@ -121,7 +121,7 @@ export default function Signup() {
           </TextField>
 
           <TextField className="flex flex-col gap-1" isRequired>
-            <Label> Confirm Password </Label>
+            <Label>Confirm Password</Label>
 
             <Input
               type="password"
@@ -145,7 +145,7 @@ export default function Signup() {
         </Form>
 
         <div className="text-sm text-center mt-6">
-          Don’t have an account?{" "}
+          Already have an account?{" "}
           <Link className="text-blue-500" href="/login">
             Login
           </Link>
