@@ -145,7 +145,7 @@ export default function Signup() {
         </Form>
 
         <div className="text-sm text-center mt-6">
-          Don’t have an account?{" "}
+          Already have an account?{" "}
           <Link className="text-blue-500" href="/login">
             Login
           </Link>
