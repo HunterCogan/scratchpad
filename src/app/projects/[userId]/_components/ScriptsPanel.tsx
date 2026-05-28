@@ -54,10 +54,7 @@ export function ScriptsPanel({ raw, scripts }: Props) {
         )}
       </div>
       {isEmpty || isRawToggled ? (
-        <Surface
-          className="flex flex-wrap flex-1 overflow-auto whitespace-pre-wrap p-3 min-h-0 border-1 rounded-lg"
-          variant="tertiary"
-        >
+        <Surface className="flex flex-wrap flex-1 overflow-auto whitespace-pre-wrap p-3 min-h-0 border-1 rounded-lg">
           {raw}
         </Surface>
       ) : (
