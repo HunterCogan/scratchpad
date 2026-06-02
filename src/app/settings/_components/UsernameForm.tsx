@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function UsernameForm({ initialName }: { initialName: string }) {
   const [name, setName] = useState(initialName);
@@ -68,12 +68,14 @@ export default function UsernameForm({ initialName }: { initialName: string }) {
             px-5
             py-2
             rounded-full
-            bg-blue-600
-            text-white
+            border
+            border-gray-300
+            bg-white
+            text-gray-700
             font-medium
-            hover:bg-blue-700
+            hover:bg-gray-50
             transition
-            "
+        "
         >
           Update Username
         </button>
@@ -95,9 +97,7 @@ export default function UsernameForm({ initialName }: { initialName: string }) {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="text-2xl"
-              >
-                ×
-              </button>
+              ></button>
             </div>
 
             <p className="mt-3 text-sm text-gray-500">
@@ -128,7 +128,18 @@ export default function UsernameForm({ initialName }: { initialName: string }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 bg-blue-600 text-white rounded-full"
+                  className="
+                    px-5
+                    py-2
+                    rounded-full
+                    border
+                    border-gray-300
+                    bg-white
+                    text-gray-700
+                    font-medium
+                    hover:bg-gray-50
+                    transition
+                    "
                 >
                   {loading ? "Saving..." : "Confirm"}
                 </button>
