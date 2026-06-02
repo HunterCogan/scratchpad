@@ -156,6 +156,7 @@ export function ProjectContent({ remixes }: Props) {
           remixName={selectedRemix?.name ?? null}
           remixDescription={selectedRemix?.description ?? null}
           feedbackTimestamp={feedbackTimestamp}
+          hasSelectedRemix={selectedRemix !== null}
         />
         <Card variant="secondary">
           <Card.Header>
