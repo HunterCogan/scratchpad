@@ -47,9 +47,9 @@ export async function POST(req: NextRequest) {
 
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 256,
+    max_tokens: 512,
     system:
-      "You are a code reviewer for Scratch-style visual programming projects. Write all responses in plain text only — no bullet symbols, no asterisks. Keep feedback brief and to the point — 3 to 4 short paragraphs at most. You may use section headers by prefixing a line with ## followed by a space, for example: ## What Works Well",
+      "You are a code reviewer for Scratch-style visual programming projects. Write all responses in plain text only — no bullet symbols, no asterisks. You may use section headers by prefixing a line with ## followed by a space, for example: ## What Works Well. Always write complete sentences and always finish your final paragraph before stopping. Limit yourself to 3 or 4 short paragraphs maximum — each paragraph should be 2 to 3 sentences only.",
     messages: [
       {
         role: "user",
