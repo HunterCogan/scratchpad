@@ -10,6 +10,7 @@ import { Avatar, Chip, Separator, Surface } from "@heroui/react";
 import CreateRemixModal from "./_components/CreateRemixModal";
 import { BackButton } from "../../../components/BackButton";
 import AddCollaboratorModal from "./_components/AddCollaboratorModal";
+import EditProjectModal from "./_components/EditProjectModal";
 
 function formatTimestamp(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -112,15 +113,24 @@ export default async function ProjectPage({
                   </Avatar.Fallback>
                 </Avatar>
               ))}
+
               <Avatar className="border-2 border-white">
                 <Avatar.Fallback style={{ backgroundColor: creator?.color }}>
                   {creator?.name?.substring(0, 2).toUpperCase()}
                 </Avatar.Fallback>
               </Avatar>
+
               <span className="ml-2">
                 <AddCollaboratorModal projectId={project._id.toString()} />
               </span>
             </div>
+
+            <EditProjectModal
+              projectId={project._id.toString()}
+              initialName={project.name}
+              initialDescription={project.description ?? ""}
+            />
+
             <CreateRemixModal
               projectId={project._id.toString()}
               creatorId={userId}
