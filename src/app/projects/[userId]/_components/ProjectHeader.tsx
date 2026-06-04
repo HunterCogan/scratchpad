@@ -40,6 +40,10 @@ export function ProjectHeader({
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
 
+  // Creates a copy of team where session user is first
+  // used to display session user's Avatar next to the project creator
+  const sortedTeam = [...team].sort((a) => (a.id === userId ? -1 : 0));
+
   return (
     <Surface className="flex flex-row justify-between rounded-3xl p-6">
       <div className="flex flex-row flex-1 gap-6">
@@ -64,19 +68,28 @@ export function ProjectHeader({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row justify-end">
-          {team.map((member) => (
-            <Avatar key={member.id} className="-mr-4 border-2 border-white">
-              <Avatar.Fallback style={{ backgroundColor: member.color }}>
-                {member.name.substring(0, 2).toUpperCase()}
+        <div className="flex justify-end">
+          <div className="flex -space-x-2">
+            <Avatar className="ring-2 ring-white">
+              <Avatar.Fallback style={{ backgroundColor: creatorColor }}>
+                {creatorName.substring(0, 2).toUpperCase()}
               </Avatar.Fallback>
             </Avatar>
-          ))}
-          <Avatar className="border-2 border-white">
-            <Avatar.Fallback style={{ backgroundColor: creatorColor }}>
-              {creatorName.substring(0, 2).toUpperCase()}
-            </Avatar.Fallback>
-          </Avatar>
+            {sortedTeam.slice(0, 2).map((member) => (
+              <Avatar key={member.id} className="ring-2 ring-white">
+                <Avatar.Fallback style={{ backgroundColor: member.color }}>
+                  {member.name.substring(0, 2).toUpperCase()}
+                </Avatar.Fallback>
+              </Avatar>
+            ))}
+            {team.length - 2 > 0 && (
+              <Avatar className="ring-2 ring-white">
+                <Avatar.Fallback className="text-xs">
+                  +{team.length - 2}
+                </Avatar.Fallback>
+              </Avatar>
+            )}
+          </div>
           {userId === creatorId && (
             <span className="ml-2">
               <AddCollaboratorModal projectId={projectId} />
