@@ -14,7 +14,6 @@ import {
   Tooltip,
   useOverlayState,
 } from "@heroui/react";
-import { BackButton } from "@/components/BackButton";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
 import { UserMinusIcon } from "@heroicons/react/24/outline";
@@ -61,8 +60,10 @@ export function ProjectHeader({
   // Creates a copy of team where project creator is sortedTeam[0] and session user is sortedTeam[1]
   const sortedTeam = [
     { id: creatorId, name: creatorName, color: creatorColor },
-    ...[...team],
-  ].sort((a) => (a.id === userId ? -1 : 0));
+    ...[...team]
+      .filter((m) => m.id !== creatorId)
+      .sort((a) => (a.id === userId ? -1 : 0)),
+  ];
 
   async function handleLeaveProject() {
     setLoading(true);
@@ -76,7 +77,6 @@ export function ProjectHeader({
   return (
     <Surface className="flex flex-row justify-between rounded-3xl p-6">
       <div className="flex flex-row flex-1 gap-6">
-        <BackButton href="/dashboard" />
         <div className="flex flex-col flex-1">
           <Input
             value={name}
@@ -105,7 +105,7 @@ export function ProjectHeader({
                 target="_blank"
                 href={`/users/${member.id}`}
               >
-                <Tooltip>
+                <Tooltip delay={0}>
                   <Tooltip.Trigger>
                     <Avatar className="ring-2 ring-white">
                       <Avatar.Fallback
