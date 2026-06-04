@@ -1,10 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar, Chip, Input, Surface, TextArea } from "@heroui/react";
+import {
+  AlertDialog,
+  Avatar,
+  Button,
+  Chip,
+  Input,
+  Spinner,
+  Surface,
+  TextArea,
+  Tooltip,
+  useOverlayState,
+} from "@heroui/react";
 import { BackButton } from "@/components/BackButton";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
+import { UserMinusIcon } from "@heroicons/react/24/outline";
 
 interface TeamMember {
   id: string;
@@ -39,10 +51,23 @@ export function ProjectHeader({
 }: ProjectHeaderProps) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
+  const [loading, setLoading] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
+
+  const leaveState = useOverlayState();
 
   // Creates a copy of team where session user is first
   // used to display session user's Avatar next to the project creator
   const sortedTeam = [...team].sort((a) => (a.id === userId ? -1 : 0));
+
+  async function handleLeaveProject() {
+    setLoading(true);
+    try {
+      // TODO: implement when UPDATE route is ready
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <Surface className="flex flex-row justify-between rounded-3xl p-6">
@@ -68,7 +93,7 @@ export function ProjectHeader({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-1">
           <div className="flex -space-x-2">
             <Avatar className="ring-2 ring-white">
               <Avatar.Fallback style={{ backgroundColor: creatorColor }}>
@@ -91,10 +116,62 @@ export function ProjectHeader({
             )}
           </div>
           {userId === creatorId && (
-            <span className="ml-2">
-              <AddCollaboratorModal projectId={projectId} />
-            </span>
+            <AddCollaboratorModal projectId={projectId} />
           )}
+          <AlertDialog
+            isOpen={leaveState.isOpen}
+            onOpenChange={leaveState.setOpen}
+          >
+            <Tooltip>
+              <Button
+                variant="danger-soft"
+                isIconOnly
+                onPress={leaveState.open}
+              >
+                <UserMinusIcon />
+              </Button>
+              <Tooltip.Content>
+                <p>Leave project</p>
+              </Tooltip.Content>
+            </Tooltip>
+
+            <AlertDialog.Backdrop>
+              <AlertDialog.Container>
+                <AlertDialog.Dialog>
+                  <AlertDialog.CloseTrigger className="m-3" />
+
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                      <AlertDialog.Icon />
+                      Leave Project?
+                    </AlertDialog.Heading>
+                  </AlertDialog.Header>
+
+                  <AlertDialog.Body>
+                    You will no longer be able to contribute to this project.
+                    {leaveError && (
+                      <p className="text-red-500 text-sm mt-2">{leaveError}</p>
+                    )}
+                  </AlertDialog.Body>
+
+                  <AlertDialog.Footer>
+                    <Button variant="outline" onPress={leaveState.close}>
+                      Cancel
+                    </Button>
+
+                    <Button
+                      variant="danger"
+                      isDisabled={loading}
+                      onPress={handleLeaveProject}
+                    >
+                      {loading && <Spinner size="sm" />}
+                      {loading ? "Leaving..." : "Leave"}
+                    </Button>
+                  </AlertDialog.Footer>
+                </AlertDialog.Dialog>
+              </AlertDialog.Container>
+            </AlertDialog.Backdrop>
+          </AlertDialog>
         </div>
         <CreateRemixModal projectId={projectId} creatorId={creatorId} />
       </div>

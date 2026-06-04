@@ -279,10 +279,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                             <Button
                               variant="danger"
                               isDisabled={loading}
-                              onPress={async () => {
-                                await handleDeleteRemix();
-                                deleteState.close();
-                              }}
+                              onPress={handleDeleteRemix}
                             >
                               {loading && <Spinner size="sm" />}
                               {loading ? "Deleting..." : "Delete"}

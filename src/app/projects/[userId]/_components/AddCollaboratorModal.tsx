@@ -12,6 +12,7 @@ import {
   Modal,
   SearchField,
   Spinner,
+  Tooltip,
   useOverlayState,
 } from "@heroui/react";
 
@@ -49,10 +50,14 @@ export default function AddCollaboratorModal({
 
   return (
     <Modal state={state}>
-      <Button variant="outline" fullWidth>
-        <UserPlusIcon />
-        Add Collaborator
-      </Button>
+      <Tooltip>
+        <Button variant="ghost" isIconOnly>
+          <UserPlusIcon />
+        </Button>
+        <Tooltip.Content>
+          <p>Add collaborator</p>
+        </Tooltip.Content>
+      </Tooltip>
       <Modal.Backdrop variant="blur">
         <Modal.Container>
           <Modal.Dialog>
