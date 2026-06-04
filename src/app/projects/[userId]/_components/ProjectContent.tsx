@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { AlertDialog, Spinner, useOverlayState } from "@heroui/react";
 import {
@@ -9,7 +10,6 @@ import {
   Button,
   Card,
   Chip,
-  Link,
   ScrollShadow,
   Separator,
 } from "@heroui/react";
@@ -155,13 +155,15 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                   <Card.Description>Created {remix.createdAt}</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-row gap-2 items-center">
-                  <Avatar size="sm">
-                    <Avatar.Fallback
-                      style={{ backgroundColor: remix.uploaderColor }}
-                    >
-                      {remix.uploaderName.substring(0, 2).toUpperCase()}
-                    </Avatar.Fallback>
-                  </Avatar>
+                  <Link target="_blank" href={`/users/${remix.uploaderId}`}>
+                    <Avatar size="sm">
+                      <Avatar.Fallback
+                        style={{ backgroundColor: remix.uploaderColor }}
+                      >
+                        {remix.uploaderName.substring(0, 2).toUpperCase()}
+                      </Avatar.Fallback>
+                    </Avatar>
+                  </Link>
                   <span className="truncate text-sm"> {remix.description}</span>
                 </Card.Content>
                 <Card.Footer>
@@ -202,9 +204,12 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
               <Card.Title>About this Remix</Card.Title>
               <Card.Description>
                 {selectedRemix.name} created {selectedRemix.createdAt} by{" "}
-                <Link href="#">
-                  @{selectedRemix.uploaderName}
-                  <Link.Icon />
+                <Link
+                  className="link"
+                  target="_blank"
+                  href={`/users/${selectedRemix.uploaderId}`}
+                >
+                  {selectedRemix.uploaderName}
                 </Link>
               </Card.Description>
             </Card.Header>

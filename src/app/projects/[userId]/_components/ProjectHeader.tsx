@@ -6,6 +6,7 @@ import {
   Avatar,
   Button,
   Chip,
+  Dropdown,
   Input,
   Spinner,
   Surface,
@@ -17,6 +18,7 @@ import { BackButton } from "@/components/BackButton";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
 import { UserMinusIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 interface TeamMember {
   id: string;
@@ -56,9 +58,11 @@ export function ProjectHeader({
 
   const leaveState = useOverlayState();
 
-  // Creates a copy of team where session user is first
-  // used to display session user's Avatar next to the project creator
-  const sortedTeam = [...team].sort((a) => (a.id === userId ? -1 : 0));
+  // Creates a copy of team where project creator is sortedTeam[0] and session user is sortedTeam[1]
+  const sortedTeam = [
+    { id: creatorId, name: creatorName, color: creatorColor },
+    ...[...team],
+  ].sort((a) => (a.id === userId ? -1 : 0));
 
   async function handleLeaveProject() {
     setLoading(true);
@@ -95,24 +99,51 @@ export function ProjectHeader({
       <div className="flex flex-col gap-2">
         <div className="flex justify-end gap-1">
           <div className="flex -space-x-2">
-            <Avatar className="ring-2 ring-white">
-              <Avatar.Fallback style={{ backgroundColor: creatorColor }}>
-                {creatorName.substring(0, 2).toUpperCase()}
-              </Avatar.Fallback>
-            </Avatar>
-            {sortedTeam.slice(0, 2).map((member) => (
-              <Avatar key={member.id} className="ring-2 ring-white">
-                <Avatar.Fallback style={{ backgroundColor: member.color }}>
-                  {member.name.substring(0, 2).toUpperCase()}
-                </Avatar.Fallback>
-              </Avatar>
+            {sortedTeam.slice(0, 3).map((member) => (
+              <Link
+                key={member.id}
+                target="_blank"
+                href={`/users/${member.id}`}
+              >
+                <Tooltip>
+                  <Tooltip.Trigger>
+                    <Avatar className="ring-2 ring-white">
+                      <Avatar.Fallback
+                        style={{ backgroundColor: member.color }}
+                      >
+                        {member.name.substring(0, 2).toUpperCase()}
+                      </Avatar.Fallback>
+                    </Avatar>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>
+                    <p>{member.name}</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </Link>
             ))}
-            {team.length - 2 > 0 && (
-              <Avatar className="ring-2 ring-white">
-                <Avatar.Fallback className="text-xs">
-                  +{team.length - 2}
-                </Avatar.Fallback>
-              </Avatar>
+            {sortedTeam.length - 3 > 0 && (
+              <Dropdown>
+                <Dropdown.Trigger>
+                  <Avatar className="ring-2 ring-white">
+                    <Avatar.Fallback className="text-xs">
+                      +{sortedTeam.length - 3}
+                    </Avatar.Fallback>
+                  </Avatar>
+                </Dropdown.Trigger>
+                <Dropdown.Popover>
+                  <Dropdown.Menu>
+                    {sortedTeam.slice(3).map((member) => (
+                      <Dropdown.Item
+                        key={member.id}
+                        target="_blank"
+                        href={`/users/${member.id}`}
+                      >
+                        {member.name}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
             )}
           </div>
           {userId === creatorId && (
