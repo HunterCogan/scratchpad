@@ -33,7 +33,9 @@ export function inputLabel(input: ResolvedInput): string | null {
     case "number":
       return String(input.value);
     case "string":
-      return `"${input.value}"`;
+      return isNaN(Number(input.value)) // only add quotes if NaN (Scratch treats numbers casted to "string" as numeric)
+        ? `"${input.value}"`
+        : String(input.value);
     case "color":
       return input.value;
     case "broadcast":
