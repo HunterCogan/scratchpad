@@ -76,24 +76,30 @@ export function ProjectHeader({
   }
 
   return (
-    <Surface className="flex justify-between rounded-3xl p-4">
-      <div className="flex flex-1 gap-6">
-        <div className="flex flex-col flex-1">
+    <Surface className="flex gap-2 rounded-3xl p-4">
+      <div className="flex flex-1">
+        <div className="flex flex-col flex-1 gap-1">
           <Input
             value={name}
             readOnly={userId !== creatorId}
             onChange={(e) => setName(e.target.value)}
-            className="border-none shadow-none rounded-none text-2xl font-bold m-1 p-1"
+            className="border-none shadow-none rounded-sm text-2xl font-bold p-1"
           />
           <TextArea
             value={description}
             readOnly={userId !== creatorId}
             onChange={(e) => setDescription(e.target.value)}
-            className="resize-none border-none shadow-none rounded-none text-sm m-1 p-1"
+            className="resize-none border-none shadow-none rounded-sm text-sm p-1"
           />
           <div className="flex flex-row gap-2 my-2">
-            <Chip>Created: {createdAt}</Chip>
-            {lastUpdated && <Chip>Updated: {lastUpdated}</Chip>}
+            <Chip size="sm">
+              <Chip.Label>Created: {createdAt}</Chip.Label>
+            </Chip>
+            <Chip size="sm">
+              <Chip.Label>
+                Updated: {lastUpdated ? lastUpdated : "never"}
+              </Chip.Label>
+            </Chip>
           </div>
         </div>
       </div>
@@ -184,8 +190,17 @@ export function ProjectHeader({
                       </AlertDialog.Header>
 
                       <AlertDialog.Body>
-                        You will no longer be able to contribute to this
-                        project.
+                        {team.length === 0 ? (
+                          <p>
+                            <strong>{name}</strong> will be permanently deleted.
+                            This cannot be undone.
+                          </p>
+                        ) : (
+                          <p>
+                            You will no longer be able to contribute to this
+                            project.
+                          </p>
+                        )}
                         {leaveError && (
                           <p className="text-red-500 text-sm mt-2">
                             {leaveError}
@@ -194,7 +209,7 @@ export function ProjectHeader({
                       </AlertDialog.Body>
 
                       <AlertDialog.Footer>
-                        <Button variant="outline" onPress={leaveState.close}>
+                        <Button variant="tertiary" onPress={leaveState.close}>
                           Cancel
                         </Button>
 

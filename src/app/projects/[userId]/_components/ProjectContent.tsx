@@ -169,6 +169,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                 <Card.Footer>
                   <Button
                     variant="outline"
+                    size="sm"
                     onPress={() => {
                       setSelectedId(remix.id);
                       setAiFeedback(null);
@@ -276,7 +277,10 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                         </AlertDialog.Body>
 
                         <AlertDialog.Footer>
-                          <Button variant="outline" onPress={deleteState.close}>
+                          <Button
+                            variant="tertiary"
+                            onPress={deleteState.close}
+                          >
                             Cancel
                           </Button>
 
