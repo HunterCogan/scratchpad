@@ -4,6 +4,8 @@ import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import RemixModel from "@/models/Remix";
 import mongoose from "mongoose";
+import { ProjectSchema } from "@/lib/schemas/project.zod";
+import z from "zod";
 
 export async function GET(
   _req: NextRequest,
@@ -50,6 +52,23 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const body = await request.json();
+
+    const result = ProjectSchema.omit({ creator: true }).safeParse({
+      name: body.name,
+      description: body.description || undefined,
+    });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: z.flattenError(result.error).fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const session = await verifySession();
+    await connectDB();
+
     const { id } = await params;
 
     if (!id) {
@@ -62,12 +81,6 @@ export async function PUT(
         },
       );
     }
-
-    const session = await verifySession();
-
-    await connectDB();
-
-    const body = await request.json();
 
     const project = await ProjectModel.findById(id);
 
