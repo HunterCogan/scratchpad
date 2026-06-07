@@ -45,6 +45,87 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json(
+        {
+          error: "Project ID is required",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const session = await verifySession();
+
+    await connectDB();
+
+    const body = await request.json();
+
+    const project = await ProjectModel.findById(id);
+
+    if (!project) {
+      return NextResponse.json(
+        {
+          error: "Project not found",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    if (project.creator.toString() !== session.userId) {
+      return NextResponse.json(
+        {
+          error: "User does not own this project",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    if (body.name !== undefined) {
+      project.name = body.name;
+    }
+
+    if (body.description !== undefined) {
+      project.description = body.description;
+    }
+
+    await project.save();
+
+    return NextResponse.json(
+      {
+        success: true,
+        project,
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.error("Update project error:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to update project",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
