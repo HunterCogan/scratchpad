@@ -255,7 +255,7 @@ export function ScriptsPanel({
         )}
       </div>
       {isEmpty || isRawToggled ? (
-        <Surface className="flex flex-wrap flex-1 overflow-auto whitespace-pre-wrap p-3 min-h-0 border rounded-lg">
+        <Surface className="flex flex-1 overflow-auto whitespace-pre-wrap p-3 min-h-0 border rounded-lg">
           <code className="text-sm">{raw}</code>
         </Surface>
       ) : (
