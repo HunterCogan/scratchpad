@@ -141,7 +141,7 @@ export function ScriptsPanel({
                                               <Button
                                                 slot="trigger"
                                                 variant="secondary"
-                                                className="bg-transparent"
+                                                className="flex bg-transparent justify-between"
                                                 fullWidth
                                               >
                                                 {suggestion.title}
@@ -185,7 +185,7 @@ export function ScriptsPanel({
                                             <Button
                                               slot="trigger"
                                               variant="secondary"
-                                              className="bg-transparent"
+                                              className="flex bg-transparent justify-between"
                                               fullWidth
                                             >
                                               {issue.title}
