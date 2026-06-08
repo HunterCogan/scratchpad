@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   AlertDialog,
   Avatar,
   Button,
   ButtonGroup,
   Dropdown,
+  FieldError,
   Header,
   Input,
   Popover,
   Spinner,
   Surface,
   TextArea,
+  TextField,
   Tooltip,
   useOverlayState,
 } from "@heroui/react";
@@ -23,6 +25,7 @@ import {
   UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { ProjectSchema } from "@/lib/schemas/project.zod";
 
 interface TeamMember {
   id: string;
@@ -59,6 +62,11 @@ export function ProjectHeader({
   const [description, setDescription] = useState(initialDescription);
   const [loading, setLoading] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const savedRef = useRef({
+    name: initialName,
+    description: initialDescription,
+  });
 
   const leaveState = useOverlayState();
 
@@ -70,6 +78,38 @@ export function ProjectHeader({
       .sort((a) => (a.id === userId ? -1 : 0)),
   ];
   const isVisitor = !sortedTeam.some((m) => m.id === userId);
+
+  async function handleSave() {
+    const nameResult = ProjectSchema.shape.name.safeParse(name);
+    const descResult = ProjectSchema.shape.description.safeParse(
+      description || undefined,
+    );
+
+    if (!nameResult.success || !descResult.success) return;
+    if (
+      name === savedRef.current.name &&
+      description === savedRef.current.description
+    )
+      return;
+
+    setSaveError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description }),
+      });
+
+      if (res.ok) {
+        savedRef.current = { name, description };
+      } else {
+        const { error } = await res.json().catch(() => ({}));
+        setSaveError(typeof error === "string" ? error : "Failed to save");
+      }
+    } catch {
+      setSaveError("Failed to save");
+    }
+  }
 
   async function handleLeaveProject() {
     setLoading(true);
@@ -84,18 +124,44 @@ export function ProjectHeader({
     <Surface className="flex gap-2" variant="transparent">
       <div className="flex flex-1">
         <div className="flex flex-col flex-1 gap-1">
-          <Input
+          <TextField
+            aria-label="Project name"
+            isRequired
+            isReadOnly={userId !== creatorId}
             value={name}
-            readOnly={userId !== creatorId}
-            onChange={(e) => setName(e.target.value)}
-            className="bg-transparent border-none shadow-none rounded-sm text-2xl font-bold p-1"
-          />
-          <TextArea
+            onChange={setName}
+            onBlur={handleSave}
+            validationBehavior="aria"
+            validate={(value) => {
+              if (!value) return "Project name is required";
+              const result = ProjectSchema.shape.name.safeParse(value);
+              return result.success ? null : result.error.issues[0].message;
+            }}
+          >
+            <Input className="bg-transparent border-none shadow-none rounded-sm text-2xl font-bold p-1" />
+            <FieldError />
+          </TextField>
+          <TextField
+            aria-label="Project description"
+            isReadOnly={userId !== creatorId}
             value={description}
-            readOnly={userId !== creatorId}
-            onChange={(e) => setDescription(e.target.value)}
-            className="resize-none bg-transparent border-none shadow-none rounded-sm text-sm p-1"
-          />
+            onChange={setDescription}
+            onBlur={handleSave}
+            validationBehavior="aria"
+            validate={(value) => {
+              if (!value) return null;
+              const result = ProjectSchema.shape.description.safeParse(value);
+              return result.success
+                ? null
+                : (result.error.issues[0]?.message ?? null);
+            }}
+          >
+            <TextArea className="resize-none bg-transparent border-none shadow-none rounded-sm text-sm p-1" />
+            <FieldError />
+          </TextField>
+          {saveError && (
+            <p className="text-xs text-red-500 px-1">{saveError}</p>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-2">
