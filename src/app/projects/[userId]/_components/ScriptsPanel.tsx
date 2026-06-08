@@ -7,6 +7,8 @@ import {
   Card,
   ComboBox,
   Description,
+  Disclosure,
+  DisclosureGroup,
   Input,
   Label,
   ListBox,
@@ -21,17 +23,18 @@ import {
 import {
   ArrowDownTrayIcon,
   InformationCircleIcon,
+  PlusIcon,
   SparklesIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import ReactMarkdown from "react-markdown";
 import { ScriptStack } from "./ScriptStack";
-import type { Script } from "@/types";
+import type { Script, AiFeedback } from "@/types";
 
 interface Props {
   raw: string | undefined;
   scripts: Record<string, Script[]>;
-  aiFeedback: string | null;
+  aiFeedback: AiFeedback | null;
   loadingFeedback: boolean;
   onGetFeedback: () => void;
   onDeleteRemix: () => Promise<void>;
@@ -114,8 +117,93 @@ export function ScriptsPanel({
                     {aiFeedback && (
                       <Card variant="secondary">
                         <Card.Content className="overflow-auto">
-                          <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                            <ReactMarkdown>{aiFeedback}</ReactMarkdown>
+                          <div className="">
+                            <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                              <h4>What Works Well</h4>
+                              <ReactMarkdown>
+                                {aiFeedback.what_works_well}
+                              </ReactMarkdown>
+                            </div>
+                            <div>
+                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                <h4>Suggestions</h4>
+                              </div>
+                              <DisclosureGroup>
+                                {aiFeedback.suggestions.map((suggestion, i) => {
+                                  return (
+                                    <div key={i}>
+                                      <Disclosure>
+                                        <Disclosure.Heading>
+                                          <Button
+                                            slot="trigger"
+                                            variant="secondary"
+                                            className="bg-transparent"
+                                            fullWidth
+                                          >
+                                            {suggestion.title}
+                                            <Disclosure.Indicator />
+                                          </Button>
+                                        </Disclosure.Heading>
+                                        <Disclosure.Content>
+                                          <Disclosure.Body>
+                                            <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                              <ReactMarkdown>
+                                                {suggestion.detail}
+                                              </ReactMarkdown>
+                                            </div>
+                                            <Button size="sm" className="mt-4">
+                                              <SparklesIcon />
+                                              Remix
+                                            </Button>
+                                          </Disclosure.Body>
+                                        </Disclosure.Content>
+                                      </Disclosure>
+                                      <Separator />
+                                    </div>
+                                  );
+                                })}
+                              </DisclosureGroup>
+                            </div>
+                            <div>
+                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                <h4>Logic Issues</h4>
+                              </div>
+                              <DisclosureGroup>
+                                {aiFeedback.logic_issues.map((issue, i) => {
+                                  return (
+                                    <div key={i}>
+                                      <Disclosure>
+                                        <Disclosure.Heading>
+                                          <Button
+                                            slot="trigger"
+                                            variant="secondary"
+                                            className="bg-transparent"
+                                            fullWidth
+                                          >
+                                            {issue.title}
+                                            <Disclosure.Indicator />
+                                          </Button>
+                                        </Disclosure.Heading>
+                                        <Disclosure.Content>
+                                          <Disclosure.Body>
+                                            <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                              <ReactMarkdown>
+                                                {issue.detail}
+                                              </ReactMarkdown>
+                                            </div>
+                                            <Button size="sm" className="mt-4">
+                                              <SparklesIcon />
+                                              Remix
+                                            </Button>
+                                          </Disclosure.Body>
+                                        </Disclosure.Content>
+                                      </Disclosure>
+                                      <Separator />
+                                    </div>
+                                  );
+                                })}
+                              </DisclosureGroup>
+                            </div>
                           </div>
                         </Card.Content>
                       </Card>
