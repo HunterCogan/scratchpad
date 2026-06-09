@@ -35,9 +35,6 @@ export async function PATCH(request: NextRequest) {
       { new: true },
     ).lean();
 
-    console.log("RESULT DATA:", result.data);
-    console.log("UPDATED USER:", user);
-
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
