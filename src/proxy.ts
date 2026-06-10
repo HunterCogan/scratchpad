@@ -6,7 +6,6 @@ const protectedRoutes = [
   "/favorites",
   "/shared-projects",
   "/settings",
-  "/users",
 ];
 
 const authRoutes = ["/login", "/signup"];
