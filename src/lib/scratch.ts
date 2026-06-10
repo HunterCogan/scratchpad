@@ -145,7 +145,7 @@ export function getAllFieldValues(block: Block): Record<string, string> {
 function collectBlocks(
   startId: string | null,
   blockMap: BlockMap,
-  recursive: boolean,
+  substackOnly: boolean,
   collected: Block[],
 ): void {
   let currentId: string | null = startId;
@@ -157,11 +157,20 @@ function collectBlocks(
     const stamped = { ...block, id: currentId };
     collected.push(stamped);
 
-    // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
-    if (recursive) {
+    if (substackOnly) {
+      // Only recurse into C-block substack (SUBSTACK, SUBSTACK2)
+      for (const [key, rawInput] of Object.entries(stamped.inputs)) {
+        if (key.startsWith("SUBSTACK")) {
+          const bodyId = rawInput[1];
+          if (typeof bodyId === "string")
+            collectBlocks(bodyId, blockMap, substackOnly, collected);
+        }
+      }
+    } else {
+      // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
       for (const input of Object.values(getAllInputValues(stamped))) {
         if (input.type === "block")
-          collectBlocks(input.blockId, blockMap, recursive, collected);
+          collectBlocks(input.blockId, blockMap, substackOnly, collected);
       }
     }
 
@@ -179,11 +188,13 @@ function collectBlocks(
  * ```
  *
  * @param raw - The full text content of a Scratch `project.json` file.
+ * @param excludeReporters - When `true`, reporter inputs (boolean conditions, operators, sensing blocks, etc.) are excluded, useful if you intend to handle these blocks inline.
+ * When `false` (default), all nested block inputs are collected recursively.
  * @returns A record mapping each target name to its array of `Script` objects.
  */
 export function parseScripts(
   raw: string,
-  recursive: boolean = false,
+  excludeReporters: boolean = false,
 ): Record<string, Script[]> {
   const project: ScratchProject = JSON.parse(raw);
   const result: Record<string, Script[]> = {};
@@ -193,7 +204,7 @@ export function parseScripts(
     for (const [id, block] of Object.entries(target.blocks)) {
       if (block.topLevel && !block.shadow) {
         const blocks: Block[] = [];
-        collectBlocks(id, target.blocks, recursive, blocks);
+        collectBlocks(id, target.blocks, excludeReporters, blocks);
         scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
       }
     }
