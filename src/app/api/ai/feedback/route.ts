@@ -1,31 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession } from "@/lib/dal";
-import { parseScripts } from "@/lib/scratch";
-import type { Script } from "@/types";
-import { blockToLine } from "@/lib/scratch-pseudocode";
-import { computeIndents } from "@/lib/scratch-pseudocode";
 
 const client = new Anthropic();
-
-function scriptsToPseudocode(scripts: Record<string, Script[]>): string {
-  const sections: string[] = [];
-
-  for (const [targetName, targetScripts] of Object.entries(scripts)) {
-    if (targetScripts.length === 0) continue;
-    const lines: string[] = [`Target: ${targetName}`];
-    for (const script of targetScripts) {
-      lines.push("");
-      const indents = computeIndents(script.blocks);
-      for (const [i, block] of script.blocks.entries()) {
-        lines.push(`${"  ".repeat(indents[i])}${blockToLine(block)}`);
-      }
-    }
-    sections.push(lines.join("\n"));
-  }
-
-  return sections.join("\n\n");
-}
 
 export async function POST(req: NextRequest) {
   await verifySession();
@@ -34,21 +11,6 @@ export async function POST(req: NextRequest) {
 
   if (!projectJsonData) {
     return NextResponse.json({ error: "No code provided" }, { status: 400 });
-  }
-
-  let pseudocode: string;
-  try {
-    const scripts = parseScripts(projectJsonData);
-    pseudocode = scriptsToPseudocode(scripts);
-  } catch {
-    pseudocode = projectJsonData;
-  }
-
-  if (!pseudocode) {
-    return NextResponse.json(
-      { error: "Failed to parse project" },
-      { status: 400 },
-    );
   }
 
   const message = await client.messages.create({
@@ -71,7 +33,7 @@ export async function POST(req: NextRequest) {
         role: "user",
         content: `Review this remix called "${remixName}" with description: "${remixDescription}".
 This is the code to review:
-${pseudocode}
+${projectJsonData}
 `,
       },
     ],
