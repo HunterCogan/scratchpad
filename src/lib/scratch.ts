@@ -179,6 +179,35 @@ function collectBlocks(
 }
 
 /**
+ * Returns every `Script` in a Scratch project, grouped by target name.
+ *
+ * @param project - A parsed Scratch project.
+ * @param excludeReporters - When `true`, reporter inputs (boolean conditions, operators, sensing blocks, etc.) are excluded, useful if you intend to handle these blocks inline.
+ * When `false` (default), all nested block inputs are collected recursively.
+ * @returns A record mapping each target name to its array of `Script` objects.
+ */
+export function getScripts(
+  project: ScratchProject,
+  excludeReporters: boolean = false,
+): Record<string, Script[]> {
+  const result: Record<string, Script[]> = {};
+
+  for (const target of project.targets) {
+    const scripts: Script[] = [];
+    for (const [id, block] of Object.entries(target.blocks)) {
+      if (block.topLevel && !block.shadow) {
+        const blocks: Block[] = [];
+        collectBlocks(id, target.blocks, excludeReporters, blocks);
+        scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
+      }
+    }
+    result[target.name] = scripts;
+  }
+
+  return result;
+}
+
+/**
  * Parses raw `project.json` text and returns every `Script` grouped by target name.
  *
  * ```ts
@@ -196,20 +225,5 @@ export function parseScripts(
   raw: string,
   excludeReporters: boolean = false,
 ): Record<string, Script[]> {
-  const project: ScratchProject = JSON.parse(raw);
-  const result: Record<string, Script[]> = {};
-
-  for (const target of project.targets) {
-    const scripts: Script[] = [];
-    for (const [id, block] of Object.entries(target.blocks)) {
-      if (block.topLevel && !block.shadow) {
-        const blocks: Block[] = [];
-        collectBlocks(id, target.blocks, excludeReporters, blocks);
-        scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
-      }
-    }
-    result[target.name] = scripts;
-  }
-
-  return result;
+  return getScripts(JSON.parse(raw), excludeReporters);
 }
