@@ -87,7 +87,7 @@ export default function LoginPage({
     currentPage === "login" ? "h-screen place-items-center" : "";
 
   return (
-    <div className={`grid p-12 ${pageStyles}`}>
+    <div className={`grid p-6 sm:p-12 ${pageStyles}`}>
       <div className="flex flex-col items-center w-full">
         {currentPage === "home" ? (
           <>
