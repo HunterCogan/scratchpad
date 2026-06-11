@@ -16,6 +16,10 @@ export const auth = betterAuth({
   database: mongodbAdapter(client.db()),
   secret: authSecret,
   user: {
+    deleteUser: {
+      enabled: true,
+    },
+
     additionalFields: {
       color: {
         type: "string",
@@ -46,16 +50,20 @@ export const auth = betterAuth({
   // "sendVerificationEmail" in "emailVerification" and set "requireEmailVerification" to true.
   // This is an optional thing that we will discuss in the future
 
-  // Session configuration. 7 days in seconds for expiration. Updates every 24 hours.
+  // Session configuration can set the session duration and cookie attributes.
   session: {
-    expiresIn: 7 * 24 * 60 * 60,
+    expiresIn: 60 * 60 * 24, // 1 day base session
     updateAgeUnitInMs: 24 * 60 * 60 * 1000,
     cookieAttributes: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60,
     },
+  },
+
+  rememberMe: {
+    enabled: true,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   // JWT token configuration
