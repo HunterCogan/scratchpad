@@ -176,7 +176,7 @@ export function rawToPseudocode(raw: string, targets?: string[]): string {
               const line = blockToLine(block, blockMap);
               pseudocode +=
                 i === 0
-                  ? `${line}${line.endsWith(":") ? "" : ":"}\n`
+                  ? `${line}${!line.endsWith(":") && block.next ? ":" : ""}\n`
                   : `${"\t".repeat(indents[i] + 1)}${line}\n`;
             }
           }
