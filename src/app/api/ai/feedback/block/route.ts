@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession } from "@/lib/dal";
 import type { AIFeedback } from "@/types";
-import { feedbackTool } from "@/lib/anthropic";
+import { feedbackTool, FEEDBACK_SYSTEM } from "@/lib/anthropic";
 import { rawToPseudocode } from "@/lib/scratch-pseudocode";
 import connectDB from "@/lib/db";
 import RemixModel from "@/models/Remix";
@@ -44,23 +44,10 @@ export async function POST(req: NextRequest) {
   try {
     message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 700,
+      max_tokens: 1400,
       tools: [feedbackTool],
       tool_choice: { type: "tool", name: "submit_feedback" },
-      system: [
-        {
-          type: "text",
-          text: `
-    You are an export Scratch mentor for young learners.
-    You are given the pseudocode of a project.json file.
-    You provide constructive feedback that is friendly and enthusiastic.
-    You can use markdown for code snippets, bold, italics, etc.
-    Your language can be understood by young learners, and you keep sentences consise.
-    You do not include emojis in your feedback.
-    `,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
+      system: FEEDBACK_SYSTEM,
       messages: [
         {
           role: "user",
@@ -77,6 +64,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "Failed to generate feedback" },
       { status: 502 },
+    );
+  }
+
+  if (message.stop_reason === "max_tokens") {
+    console.error("Anthropic message truncated by token limit.");
+    return NextResponse.json(
+      { error: "Failed to generate feedback" },
+      { status: 500 },
     );
   }
 

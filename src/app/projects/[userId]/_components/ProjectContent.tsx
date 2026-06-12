@@ -61,6 +61,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       const data = await res.json();
       if (!res.ok) {
         setAiFeedback({
+          analysis: "",
           what_works_well: "",
           suggestions: [],
           logic_issues: [],
@@ -79,6 +80,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       );
     } catch {
       setAiFeedback({
+        analysis: "",
         what_works_well: "",
         suggestions: [],
         logic_issues: [],
