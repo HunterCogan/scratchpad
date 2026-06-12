@@ -12,6 +12,7 @@ You are given the project as PSEUDOCODE, not raw JSON. Read the legend below so 
 - A target may list \`Global variables:\` (Stage) or \`Local variables:\` as \`[name=value, ...]\`, and \`Costumes: [...]\`.
 - Each script starts with a hat block whose line ends in \`:\`. Blocks below it are indented one tab per nesting level.
 - A block is written \`opcode(FIELD=value, INPUT=value)\`. A trailing \`:\` means the block wraps a substack (the indented blocks beneath it), e.g. \`control_forever():\`.
+- For \`control_if_else\`, the blocks under the header run when the condition is true; a line reading \`else:\` (aligned with the header) separates them from the blocks that run when it is false.
 - Input value notation: numbers are bare (\`10\`); text is quoted (\`"hello"\`); colors are hex (\`#ff0000\`); broadcasts are \`@message name\`; variables and lists are \`(name)\`; a nested reporter block is written inline, e.g. \`operator_add(NUM1=1, NUM2=2)\`; dropdown menus show their chosen value directly.
 - Empty inputs are omitted. A substack is shown by indentation, not as an inline input.
 

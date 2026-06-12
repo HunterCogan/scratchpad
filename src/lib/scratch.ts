@@ -159,12 +159,13 @@ function collectBlocks(
 
     if (substackOnly) {
       // Only recurse into C-block substack (SUBSTACK, SUBSTACK2)
-      for (const [key, rawInput] of Object.entries(stamped.inputs)) {
-        if (key.startsWith("SUBSTACK")) {
-          const bodyId = rawInput[1];
-          if (typeof bodyId === "string")
-            collectBlocks(bodyId, blockMap, substackOnly, collected);
-        }
+      const substackKeys = Object.keys(stamped.inputs)
+        .filter((key) => key.startsWith("SUBSTACK"))
+        .sort(); // (e.g. in an "if" statement, collect the "then" blocks before the "else" blocks)
+      for (const key of substackKeys) {
+        const bodyId = stamped.inputs[key][1];
+        if (typeof bodyId === "string")
+          collectBlocks(bodyId, blockMap, substackOnly, collected);
       }
     } else {
       // Recurse into C-block bodies (e.g repeat, forever, if, if/else)

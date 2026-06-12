@@ -8,6 +8,7 @@ import type {
 import {
   getAllFieldValues,
   getAllInputValues,
+  getInputValue,
   getScripts,
 } from "@/lib/scratch";
 
@@ -137,6 +138,15 @@ export function rawToPseudocode(raw: string, targets?: string[]): string {
         const blockMap = blockMaps[targetName];
         const target = project.targets.find((t) => t.name === targetName);
 
+        // Collect all ids that appear in any block's SUBSTACK2 input so "else" can be added before.
+        // This feels very hacky, but only opcode "control_if_else" has SUBSTACK2, so it's correct.
+        // Reference: https://github.com/scratchfoundation/scratch-editor/blob/develop/packages/scratch-vm/src/serialization/sb2_specmap.js
+        const elseIds = new Set<string>();
+        for (const b of Object.values(blockMap)) {
+          const elseInput = getInputValue(b, "SUBSTACK2");
+          if (elseInput.type === "block") elseIds.add(elseInput.blockId);
+        }
+
         // Target header (name, variables, costumes)
         pseudocode += `Target: ${targetName}\n`;
         if (target?.variables && Object.values(target.variables).length > 0) {
@@ -160,10 +170,14 @@ export function rawToPseudocode(raw: string, targets?: string[]): string {
           for (const script of targetScripts) {
             const indents = computeIndents(script.blocks);
             for (const [i, block] of script.blocks.entries()) {
+              if (i !== 0 && elseIds.has(block.id)) {
+                pseudocode += `${"\t".repeat(indents[i])}else:\n`;
+              }
+              const line = blockToLine(block, blockMap);
               pseudocode +=
                 i === 0
-                  ? `${blockToLine(block, blockMap)}:\n`
-                  : `${"\t".repeat(indents[i] + 1)}${blockToLine(block, blockMap)}\n`;
+                  ? `${line}${line.endsWith(":") ? "" : ":"}\n`
+                  : `${"\t".repeat(indents[i] + 1)}${line}\n`;
             }
           }
           pseudocode += "\n";
