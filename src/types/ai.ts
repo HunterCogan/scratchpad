@@ -6,6 +6,7 @@ export type AIFeedbackTopic = {
 
 /** Structured feedback for a Scratch remix. */
 export type AIFeedback = {
+  analysis: string;
   what_works_well: string;
   suggestions: AIFeedbackTopic[];
   logic_issues: AIFeedbackTopic[];

@@ -14,7 +14,7 @@ import {
  * number literal, `[12, "my var", "uid"]` is a variable reference).
  *
  * @param primitive - Raw primitive tuple from a block's `inputs` slot.
- * @returns - A `ResolvedInput`, identifying the primitive `type` and providing its value.
+ * @returns A `ResolvedInput`, identifying the primitive `type` and providing its value.
  */
 export function parsePrimitive(primitive: ScratchPrimitive): ResolvedInput {
   const code = primitive[0];
@@ -113,7 +113,7 @@ export function getFieldValue(block: Block, key: string): string | null {
  * ```
  *
  * @param block - The block whose inputs will be resolved.
- * @returns - A record mapping each input key to its resolved value.
+ * @returns A record mapping each input key to its resolved value.
  */
 export function getAllInputValues(block: Block): Record<string, ResolvedInput> {
   return Object.fromEntries(
@@ -134,7 +134,7 @@ export function getAllInputValues(block: Block): Record<string, ResolvedInput> {
  * ```
  *
  * @param block - The block whose fields will be resolved.
- * @returns - A record mapping each field key to its display string.
+ * @returns A record mapping each field key to its display string.
  */
 export function getAllFieldValues(block: Block): Record<string, string> {
   return Object.fromEntries(
@@ -145,6 +145,7 @@ export function getAllFieldValues(block: Block): Record<string, string> {
 function collectBlocks(
   startId: string | null,
   blockMap: BlockMap,
+  substackOnly: boolean,
   collected: Block[],
 ): void {
   let currentId: string | null = startId;
@@ -156,14 +157,55 @@ function collectBlocks(
     const stamped = { ...block, id: currentId };
     collected.push(stamped);
 
-    // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
-    for (const input of Object.values(getAllInputValues(stamped))) {
-      if (input.type === "block")
-        collectBlocks(input.blockId, blockMap, collected);
+    if (substackOnly) {
+      // Only recurse into C-block substack (SUBSTACK, SUBSTACK2)
+      const substackKeys = Object.keys(stamped.inputs)
+        .filter((key) => key.startsWith("SUBSTACK"))
+        .sort(); // (e.g. in an "if" statement, collect the "then" blocks before the "else" blocks)
+      for (const key of substackKeys) {
+        const bodyId = stamped.inputs[key][1];
+        if (typeof bodyId === "string")
+          collectBlocks(bodyId, blockMap, substackOnly, collected);
+      }
+    } else {
+      // Recurse into C-block bodies (e.g repeat, forever, if, if/else)
+      for (const input of Object.values(getAllInputValues(stamped))) {
+        if (input.type === "block")
+          collectBlocks(input.blockId, blockMap, substackOnly, collected);
+      }
     }
 
     currentId = block.next;
   }
+}
+
+/**
+ * Returns every `Script` in a Scratch project, grouped by target name.
+ *
+ * @param project - A parsed Scratch project.
+ * @param excludeReporters - When `true`, reporter inputs (boolean conditions, operators, sensing blocks, etc.) are excluded, useful if you intend to handle these blocks inline.
+ * When `false` (default), all nested block inputs are collected recursively.
+ * @returns A record mapping each target name to its array of `Script` objects.
+ */
+export function getScripts(
+  project: ScratchProject,
+  excludeReporters: boolean = false,
+): Record<string, Script[]> {
+  const result: Record<string, Script[]> = {};
+
+  for (const target of project.targets) {
+    const scripts: Script[] = [];
+    for (const [id, block] of Object.entries(target.blocks)) {
+      if (block.topLevel && !block.shadow) {
+        const blocks: Block[] = [];
+        collectBlocks(id, target.blocks, excludeReporters, blocks);
+        scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
+      }
+    }
+    result[target.name] = scripts;
+  }
+
+  return result;
 }
 
 /**
@@ -176,23 +218,13 @@ function collectBlocks(
  * ```
  *
  * @param raw - The full text content of a Scratch `project.json` file.
+ * @param excludeReporters - When `true`, reporter inputs (boolean conditions, operators, sensing blocks, etc.) are excluded, useful if you intend to handle these blocks inline.
+ * When `false` (default), all nested block inputs are collected recursively.
  * @returns A record mapping each target name to its array of `Script` objects.
  */
-export function parseScripts(raw: string): Record<string, Script[]> {
-  const project: ScratchProject = JSON.parse(raw);
-  const result: Record<string, Script[]> = {};
-
-  for (const target of project.targets) {
-    const scripts: Script[] = [];
-    for (const [id, block] of Object.entries(target.blocks)) {
-      if (block.topLevel && !block.shadow) {
-        const blocks: Block[] = [];
-        collectBlocks(id, target.blocks, blocks);
-        scripts.push({ hatBlockId: id, hat: { ...block, id }, blocks });
-      }
-    }
-    result[target.name] = scripts;
-  }
-
-  return result;
+export function parseScripts(
+  raw: string,
+  excludeReporters: boolean = false,
+): Record<string, Script[]> {
+  return getScripts(JSON.parse(raw), excludeReporters);
 }

@@ -7,6 +7,7 @@ import {
   getFieldValue,
   getAllInputValues,
   getAllFieldValues,
+  getScripts,
   parseScripts,
 } from "../scratch";
 import type { Block } from "@/types";
@@ -169,22 +170,23 @@ describe("getAllFieldValues", () => {
   });
 });
 
-// parseScripts
-describe("parseScripts", () => {
+// getScripts
+describe("getScripts", () => {
   // Project: https://scratch.mit.edu/projects/212835544/
   const RAW_PROJECT_JSON = readFileSync(
     join(__dirname, "/__fixtures__/scratch.json"),
     "utf-8",
   );
+  const project = JSON.parse(RAW_PROJECT_JSON);
 
   it("finds all 14 scripts across all targets", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     const total = Object.values(scripts).reduce((sum, s) => sum + s.length, 0);
     expect(total).toBe(14);
   });
 
   it("every script has a valid hat block marked topLevel", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     Object.values(scripts)
       .flat()
       .forEach((s) => {
@@ -195,28 +197,33 @@ describe("parseScripts", () => {
   });
 
   it("Stage has 1 script with 17 blocks", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     expect(scripts["Stage"]).toHaveLength(1);
     expect(scripts["Stage"][0].blocks).toHaveLength(17);
     expect(scripts["Stage"][0].hat.opcode).toBe("event_whenflagclicked");
   });
 
   it("Cat1 Flying has 1 script with 39 blocks", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     expect(scripts["Cat1 Flying"]).toHaveLength(1);
     expect(scripts["Cat1 Flying"][0].blocks).toHaveLength(39);
     expect(scripts["Cat1 Flying"][0].hat.opcode).toBe("event_whenflagclicked");
   });
 
+  it("Cat1 Flying with excludeReporters=true has 18 blocks", () => {
+    const noReporters = getScripts(project, true)["Cat1 Flying"][0];
+    expect(noReporters.blocks.length).toEqual(18);
+  });
+
   it("Heart, Heart2, Heart3 each have 3 scripts", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     expect(scripts["Heart"]).toHaveLength(3);
     expect(scripts["Heart2"]).toHaveLength(3);
     expect(scripts["Heart3"]).toHaveLength(3);
   });
 
   it("Heart broadcast scripts listen for scratchTouched and scratchHeal", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     const broadcastHats = scripts["Heart"].filter(
       (s) => s.hat.opcode === "event_whenbroadcastreceived",
     );
@@ -228,22 +235,47 @@ describe("parseScripts", () => {
   });
 
   it("Parrot has 1 start_as_clone script with 23 blocks", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     expect(scripts["Parrot"]).toHaveLength(1);
     expect(scripts["Parrot"][0].hat.opcode).toBe("control_start_as_clone");
     expect(scripts["Parrot"][0].blocks).toHaveLength(23);
   });
 
   it("Cloud has 2 scripts", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     expect(scripts["Cloud"]).toHaveLength(2);
   });
 
   it("Cloud start_as_clone script has 18 blocks", () => {
-    const scripts = parseScripts(RAW_PROJECT_JSON);
+    const scripts = getScripts(project);
     const cloneScript = scripts["Cloud"].find(
       (s) => s.hat.opcode === "control_start_as_clone",
     )!;
     expect(cloneScript.blocks).toHaveLength(18);
+  });
+
+  it("excludeReporters=true has all targets with same or fewer blocks than full traversal", () => {
+    const full = getScripts(project);
+    const excludeReporters = getScripts(project, true);
+    Object.keys(full).forEach((target) => {
+      expect(excludeReporters[target]).toBeDefined();
+      expect(excludeReporters[target].length).toBeLessThanOrEqual(
+        full[target].length,
+      );
+    });
+  });
+});
+
+// parseScripts
+describe("parseScripts", () => {
+  const RAW_PROJECT_JSON = readFileSync(
+    join(__dirname, "/__fixtures__/scratch.json"),
+    "utf-8",
+  );
+
+  it("produces identical output to getScripts when given the same project", () => {
+    expect(parseScripts(RAW_PROJECT_JSON)).toEqual(
+      getScripts(JSON.parse(RAW_PROJECT_JSON)),
+    );
   });
 });
