@@ -3,7 +3,7 @@
     {
       "isStage": true,
       "name": "Stage",
-      "variables": { "`jEk@4|i[#Fk?(8x)AV.-my variable": ["my variable", 0] },
+      "variables": {},
       "lists": {},
       "broadcasts": {},
       "blocks": {},
@@ -44,22 +44,22 @@
       "lists": {},
       "broadcasts": {},
       "blocks": {
-        "9/z~y@o78zp@r}1!H~Rl": {
+        "D0WH7+kW=ai+Bdxihxmd": {
           "opcode": "event_whenflagclicked",
-          "next": "~G3~h5]Ssd0xc[yj^Vs+",
+          "next": "o8,yA9MjgX|~.n!nJ{0z",
           "parent": null,
           "inputs": {},
           "fields": {},
           "shadow": false,
           "topLevel": true,
-          "x": 98,
-          "y": 180
+          "x": 182,
+          "y": 200
         },
-        "~G3~h5]Ssd0xc[yj^Vs+": {
+        "o8,yA9MjgX|~.n!nJ{0z": {
           "opcode": "looks_say",
           "next": null,
-          "parent": "9/z~y@o78zp@r}1!H~Rl",
-          "inputs": { "MESSAGE": [1, [10, "Hello, world!"]] },
+          "parent": "D0WH7+kW=ai+Bdxihxmd",
+          "inputs": { "MESSAGE": [1, [10, "Hello, World!"]] },
           "fields": {},
           "shadow": false,
           "topLevel": false
@@ -76,28 +76,9 @@
           "md5ext": "bcf454acf82e4504149f7ffe07081dbc.svg",
           "rotationCenterX": 48,
           "rotationCenterY": 50
-        },
-        {
-          "name": "costume2",
-          "bitmapResolution": 1,
-          "dataFormat": "svg",
-          "assetId": "0fb9be3e8397c983338cb71dc84d0b25",
-          "md5ext": "0fb9be3e8397c983338cb71dc84d0b25.svg",
-          "rotationCenterX": 46,
-          "rotationCenterY": 53
         }
       ],
-      "sounds": [
-        {
-          "name": "Meow",
-          "assetId": "83c36d806dc92327b9e7049a565c6bff",
-          "dataFormat": "wav",
-          "format": "",
-          "rate": 44100,
-          "sampleCount": 37376,
-          "md5ext": "83c36d806dc92327b9e7049a565c6bff.wav"
-        }
-      ],
+      "sounds": [],
       "volume": 100,
       "layerOrder": 1,
       "visible": true,
