@@ -56,13 +56,21 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       const res = await fetch("/api/ai/feedback/block", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectJsonData: selectedRemix.projectJsonData,
-          remixName: selectedRemix.name,
-          remixDescription: selectedRemix.description,
-        }),
+        body: JSON.stringify({ remixId: selectedRemix.id }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        setAiFeedback({
+          analysis: "",
+          what_works_well: "",
+          suggestions: [],
+          logic_issues: [],
+          error:
+            data.error ??
+            "Something went wrong on our end. Please try again later.",
+        });
+        return;
+      }
       setAiFeedback(data.feedback ?? null);
       setFeedbackTimestamp(
         new Date().toLocaleTimeString([], {
@@ -72,10 +80,11 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       );
     } catch {
       setAiFeedback({
+        analysis: "",
         what_works_well: "",
         suggestions: [],
         logic_issues: [],
-        error: "Failed to get feedback. Please try again later.",
+        error: "Network error. Check your connection and try again.",
       });
     } finally {
       setLoadingFeedback(false);
