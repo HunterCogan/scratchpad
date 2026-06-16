@@ -15,6 +15,7 @@ export type RemixItem = {
   uploaderName: string;
   uploaderId: string;
   uploaderColor: string;
+  uploaderImagePath?: string;
   description: string;
   isMain: boolean;
   projectJsonData: string;
@@ -130,6 +131,13 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
               >
                 <div className="flex flex-row items-center gap-2">
                   <Avatar size="sm" className="ring-2 ring-white">
+                    {remix.uploaderImagePath && (
+                      <Avatar.Image
+                        src={`https://scratchpad-profile-images.s3.us-east-1.amazonaws.com/${remix.uploaderImagePath}`}
+                        alt={remix.uploaderName}
+                      />
+                    )}
+
                     <Avatar.Fallback
                       className="select-none"
                       style={{ backgroundColor: remix.uploaderColor }}

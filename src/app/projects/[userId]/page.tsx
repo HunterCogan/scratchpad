@@ -41,8 +41,13 @@ export default async function ProjectPage({
     creator: new mongoose.Types.ObjectId(userId),
   })
     .populate<{
-      team: { _id: mongoose.Types.ObjectId; name: string; color: string }[];
-    }>("team", "name color")
+      team: {
+        _id: mongoose.Types.ObjectId;
+        name: string;
+        color: string;
+        imagePath?: string | null;
+      }[];
+    }>("team", "name color imagePath")
     .lean();
 
   if (!project) notFound();
@@ -53,8 +58,13 @@ export default async function ProjectPage({
   const remixes = await RemixModel.find({ project: project._id })
     .sort({ createdAt: -1 })
     .populate<{
-      uploader: { _id: mongoose.Types.ObjectId; name: string; color: string };
-    }>("uploader", "name color")
+      uploader: {
+        _id: mongoose.Types.ObjectId;
+        name: string;
+        color: string;
+        imagePath?: string | null;
+      };
+    }>("uploader", "name color imagePath")
     .lean();
 
   // serialization to RemixItem needed since ProjectContent is a client component
@@ -64,6 +74,7 @@ export default async function ProjectPage({
     name: remix.name,
     uploaderName: remix.uploader?.name ?? "Unknown",
     uploaderColor: remix.uploader?.color ?? "#808080",
+    uploaderImagePath: remix.uploader?.imagePath ?? undefined,
     uploaderId: remix.uploader?._id.toString()
       ? remix.uploader._id.toString()
       : remix._id.toString(),
@@ -93,9 +104,11 @@ export default async function ProjectPage({
             id: m._id.toString(),
             name: m.name,
             color: m.color,
+            imagePath: m.imagePath ?? undefined,
           }))}
           creatorName={creator?.name ?? ""}
           creatorColor={creator?.color ?? ""}
+          creatorImagePath={creator?.imagePath ?? undefined}
         />
         <Separator />
         <ProjectContent

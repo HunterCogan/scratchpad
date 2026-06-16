@@ -32,6 +32,7 @@ interface TeamMember {
   id: string;
   name: string;
   color: string;
+  imagePath?: string;
 }
 
 interface ProjectHeaderProps {
@@ -45,6 +46,7 @@ interface ProjectHeaderProps {
   team: TeamMember[];
   creatorName: string;
   creatorColor: string;
+  creatorImagePath?: string;
 }
 
 export function ProjectHeader({
@@ -58,6 +60,7 @@ export function ProjectHeader({
   team,
   creatorName,
   creatorColor,
+  creatorImagePath,
 }: ProjectHeaderProps) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
@@ -81,7 +84,12 @@ export function ProjectHeader({
 
   // Creates a copy of team where project creator is sortedTeam[0] and session user is sortedTeam[1]
   const sortedTeam = [
-    { id: creatorId, name: creatorName, color: creatorColor },
+    {
+      id: creatorId,
+      name: creatorName,
+      color: creatorColor,
+      imagePath: creatorImagePath,
+    },
     ...[...liveTeam]
       .filter((m) => m.id !== creatorId)
       .sort((a) => (a.id === userId ? -1 : 0)),
@@ -215,6 +223,13 @@ export function ProjectHeader({
                 <Tooltip delay={0}>
                   <Tooltip.Trigger>
                     <Avatar className="ring-2 ring-white">
+                      {member.imagePath && (
+                        <Avatar.Image
+                          src={`https://scratchpad-profile-images.s3.us-east-1.amazonaws.com/${member.imagePath}`}
+                          alt={member.name}
+                        />
+                      )}
+
                       <Avatar.Fallback
                         className="select-none"
                         style={{ backgroundColor: member.color }}
