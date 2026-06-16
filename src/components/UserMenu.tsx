@@ -6,19 +6,25 @@ import { logout } from "@/lib/actions/auth";
 export default function UserMenu({
   name,
   color,
+  imagePath,
   userId,
 }: {
   name: string;
   color: string | undefined;
+  imagePath: string | undefined;
   userId: string;
 }) {
   const initial = name.substring(0, 2).toUpperCase();
+  const imageUrl = imagePath
+    ? `https://scratchpad-profile-images.s3.us-east-1.amazonaws.com/${imagePath}`
+    : undefined;
 
   return (
     <div className="relative">
       <Dropdown>
         <Dropdown.Trigger>
           <Avatar className="cursor-pointer">
+            {imagePath && <Avatar.Image src={imageUrl!} alt={name} />}
             <Avatar.Fallback style={{ backgroundColor: color }}>
               {initial}
             </Avatar.Fallback>

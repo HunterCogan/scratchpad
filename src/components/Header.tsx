@@ -13,10 +13,13 @@ export default async function Header() {
 
   let displayName = "";
   let color: string | undefined;
+  let imagePath: string | undefined;
+
   if (userId) {
     const user = await User.findById(userId).lean();
     displayName = user?.name ?? session?.user?.name ?? "";
     color = user?.color;
+    imagePath = user?.imagePath ?? undefined;
   }
 
   return (
@@ -30,7 +33,12 @@ export default async function Header() {
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 shrink">
         <GlobalSearch />
         {userId ? (
-          <UserMenu name={displayName} color={color} userId={userId} />
+          <UserMenu
+            name={displayName}
+            color={color}
+            imagePath={imagePath}
+            userId={userId}
+          />
         ) : (
           <div className="flex items-center gap-2 shrink-0">
             <Link href="/login">
