@@ -47,6 +47,7 @@ export default async function UserProfilePage({
     <UserProfile
       name={user.name}
       color={user.color ?? "#808080"}
+      imagePath={user.imagePath ?? undefined}
       about={user.about ?? ""}
       isOwner={session?.user?.id === userId}
       userId={userId}

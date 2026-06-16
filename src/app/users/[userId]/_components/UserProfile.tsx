@@ -6,6 +6,7 @@ import UserProjectsList, { type UserProject } from "./UserProjectsList";
 export default function UserProfile({
   name,
   color,
+  imagePath,
   about,
   isOwner,
   userId,
@@ -13,11 +14,15 @@ export default function UserProfile({
 }: {
   name: string;
   color: string;
+  imagePath: string | undefined;
   about: string;
   isOwner: boolean;
   userId: string;
   projects: UserProject[];
 }) {
+  const imageUrl = imagePath
+    ? `https://scratchpad-profile-images.s3.us-east-1.amazonaws.com/${imagePath}`
+    : undefined;
   const initial = name.substring(0, 2).toUpperCase();
   const aboutText = about.trim();
 
@@ -27,6 +32,8 @@ export default function UserProfile({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar size="lg">
+              {imagePath && <Avatar.Image src={imageUrl!} alt={name} />}
+
               <Avatar.Fallback style={{ backgroundColor: color }}>
                 {initial}
               </Avatar.Fallback>
