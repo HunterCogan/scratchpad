@@ -5,7 +5,7 @@ import ProjectModel from "@/models/Project";
 import RemixModel, { type IProgramFile } from "@/models/Remix";
 import UserModel from "@/models/User";
 import mongoose from "mongoose";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import { ProjectHeader } from "./_components/ProjectHeader";
 import { Separator } from "@heroui/react";
@@ -35,6 +35,14 @@ export default async function ProjectPage({
   const session = await auth.api.getSession({ headers: await headers() });
   await connectDB();
 
+  const homePage = session?.session.userId ? "dashboard" : "";
+
+  if (!userId || !mongoose.isValidObjectId(userId))
+    redirect(`/${homePage}?error=invalid-user`);
+
+  if (!projectId || !mongoose.isValidObjectId(projectId))
+    redirect(`/${homePage}?error=invalid-project`);
+
   // populate the "name" field from each User object in team for displaying Avatars
   const project = await ProjectModel.findOne({
     _id: new mongoose.Types.ObjectId(projectId),
@@ -50,7 +58,7 @@ export default async function ProjectPage({
     }>("team", "name color imagePath")
     .lean();
 
-  if (!project) notFound();
+  if (!project) redirect(`/${homePage}?error=project-not-found`);
 
   const creator = await UserModel.findById(userId).lean();
 
