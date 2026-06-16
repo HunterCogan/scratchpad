@@ -37,10 +37,10 @@ export default async function ProjectPage({
 
   const homePage = session?.session.userId ? "dashboard" : "";
 
-  if (!mongoose.isValidObjectId(userId))
+  if (!userId || !mongoose.isValidObjectId(userId))
     redirect(`/${homePage}?error=invalid-user`);
 
-  if (!mongoose.isValidObjectId(projectId))
+  if (!projectId || !mongoose.isValidObjectId(projectId))
     redirect(`/${homePage}?error=invalid-project`);
 
   // populate the "name" field from each User object in team for displaying Avatars
