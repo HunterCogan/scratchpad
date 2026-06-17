@@ -4,7 +4,7 @@ import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import RemixModel, { type IProgramFile } from "@/models/Remix";
 import UserModel from "@/models/User";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import { ProjectHeader } from "./_components/ProjectHeader";
 import { Separator } from "@heroui/react";
@@ -31,8 +31,10 @@ export default async function ProjectPage({
   const session = await auth.api.getSession({ headers: await headers() });
   await connectDB();
 
+  const homePage = session?.session?.userId ? "dashboard" : "";
+
   const creator = await UserModel.findOne({ username }).lean();
-  if (!creator) notFound();
+  if (!creator) redirect(`/${homePage}?error=invalid-user`);
 
   const project = await ProjectModel.findOne({
     creator: creator._id,
@@ -49,7 +51,7 @@ export default async function ProjectPage({
     }>("team", "name username color imagePath")
     .lean();
 
-  if (!project) notFound();
+  if (!project) redirect(`/${homePage}?error=project-not-found`);
 
   const remixes = await RemixModel.find({ project: project._id })
     .sort({ createdAt: -1 })

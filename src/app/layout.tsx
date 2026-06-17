@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
+import { Suspense } from "react";
+import Providers from "./Providers";
+import FlashToast from "@/components/FlashToast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +35,12 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-        >
+        <Providers>
+          <Suspense>
+            <FlashToast />
+          </Suspense>
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
