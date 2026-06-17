@@ -29,7 +29,7 @@ export default async function Header() {
       <div className="flex items-center gap-3 sm:gap-5">
         {userId && <NavToggleButton />}
         <Link href="/dashboard" className="text-2xl sm:text-3xl font-bold">
-          Scratchpad
+          MixGit
         </Link>
       </div>
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 shrink">

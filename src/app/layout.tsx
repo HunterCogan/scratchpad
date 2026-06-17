@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scratchpad",
+  title: "MixGit",
   description: "Collaborative AI-powered coding playform",
 };
 
