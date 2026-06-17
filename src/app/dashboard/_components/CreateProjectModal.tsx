@@ -77,7 +77,7 @@ export default function CreateProjectModal() {
             <Modal.CloseTrigger className="m-2" />
             <Modal.Header>
               <Modal.Heading className="text-2xl">
-                New Scratchpad Project
+                New MixGit Project
               </Modal.Heading>
             </Modal.Header>
             <Modal.Body>
@@ -105,7 +105,7 @@ export default function CreateProjectModal() {
                   <Label>Title</Label>
                   <Input
                     variant="secondary"
-                    placeholder='"My Awesome Scratchpad Project!"'
+                    placeholder='"My Awesome MixGit Project!"'
                     aria-label="Project title"
                   />
                   <Description>

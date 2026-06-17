@@ -92,7 +92,7 @@ export default function LoginPage({
         {currentPage === "home" ? (
           <>
             <Label className="text-3xl font-semibold">Welcome back</Label>
-            <p className="opacity-80 mb-5">Log in to your Scratchpad account</p>
+            <p className="opacity-80 mb-5">Log in to your MixGit account</p>
           </>
         ) : (
           <Label className="text-5xl mb-8">Login</Label>
