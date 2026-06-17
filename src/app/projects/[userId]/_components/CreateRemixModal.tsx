@@ -159,7 +159,7 @@ export default function CreateRemixModal({
                   onSubmit={handleSearch}
                   isDisabled={searching}
                 >
-                  <Label>Import from Scratch</Label>
+                  <Label>Project Link</Label>
                   <SearchField.Group>
                     <SearchField.SearchIcon />
                     <SearchField.Input placeholder='"https://scratch.mit.edu/projects/322341152"' />
@@ -229,8 +229,8 @@ export default function CreateRemixModal({
                     variant="secondary"
                     rows={6}
                     placeholder="Paste your project data here"
+                    className="font-mono text-xs"
                   />
-                  <Description>The project data for this</Description>
                   <FieldError />
                 </TextField>
                 <ErrorMessage>{error}</ErrorMessage>
