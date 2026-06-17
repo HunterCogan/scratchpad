@@ -7,6 +7,12 @@ import {
   ResolvedInput,
 } from "@/types";
 
+/** URL for Scratch's REST API. */
+export const SCRATCH_API = "https://api.scratch.mit.edu";
+
+/** URL for Scratch's project asset server. */
+export const SCRATCH_PROJECTS = "https://projects.scratch.mit.edu";
+
 /**
  * Decodes a raw `ScratchPrimitive` tuple into a `ResolvedInput`.
  *

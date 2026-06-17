@@ -11,12 +11,14 @@ import {
   Input,
   Label,
   Modal,
+  SearchField,
   Spinner,
   TextArea,
   TextField,
   useOverlayState,
 } from "@heroui/react";
 import { RemixSchema } from "@/lib/schemas/remix.zod";
+import { projectIdSchema } from "@/lib/schemas/scratch.zod";
 import { useRouter } from "next/navigation";
 
 function SubmitButton({ isPending }: { isPending?: boolean }) {
@@ -43,6 +45,44 @@ export default function CreateRemixModal({
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [scratchUrl, setScratchUrl] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  async function handleSearch() {
+    const parsed = projectIdSchema.safeParse(scratchUrl);
+    if (!parsed.success) {
+      setSearchError(parsed.error.issues[0].message);
+      return;
+    }
+
+    setSearchError(null);
+    setSearching(true);
+    try {
+      const res = await fetch("/api/projects/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: scratchUrl }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setName(data.title ?? name);
+        setDescription(data.description ?? description);
+        setProjectData(data.projectData);
+      } else {
+        setSearchError(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to import project",
+        );
+      }
+    } catch {
+      setSearchError("Failed to import project");
+    } finally {
+      setSearching(false);
+    }
+  }
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
@@ -111,6 +151,24 @@ export default function CreateRemixModal({
                 validationBehavior="aria"
                 onSubmit={handleSubmit}
               >
+                <SearchField
+                  name="scratchUrl"
+                  value={scratchUrl}
+                  onChange={setScratchUrl}
+                  variant="secondary"
+                  onSubmit={handleSearch}
+                  isDisabled={searching}
+                >
+                  <Label>Import from Scratch</Label>
+                  <SearchField.Group>
+                    <SearchField.SearchIcon />
+                    <SearchField.Input placeholder='"https://scratch.mit.edu/projects/322341152"' />
+                  </SearchField.Group>
+                  <Description>
+                    Paste a Scratch project link to autofill the data below
+                  </Description>
+                  <ErrorMessage>{searchError}</ErrorMessage>
+                </SearchField>
                 <TextField
                   isRequired
                   name="name"
