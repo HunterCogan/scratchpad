@@ -16,6 +16,7 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import { ProjectSchema } from "@/lib/schemas/project.zod";
+import { generateSlug } from "@/lib/slugify";
 import { useRouter } from "next/navigation";
 
 // Confirmation button that show on the Modal and submits the Form inputs
@@ -52,6 +53,10 @@ export default function CreateProjectModal() {
       });
 
       if (res.ok) {
+        setName("");
+        setDescription("");
+        setSubmitted(false);
+        setError(null);
         state.close();
         router.refresh();
       } else {
@@ -84,9 +89,7 @@ export default function CreateProjectModal() {
               <Form
                 className="flex flex-col gap-4 p-1"
                 validationBehavior="aria"
-                onSubmit={(e) => {
-                  handleSubmit(e);
-                }}
+                onSubmit={handleSubmit}
               >
                 <TextField
                   isRequired
@@ -108,11 +111,12 @@ export default function CreateProjectModal() {
                     placeholder='"My Awesome Scratchpad Project!"'
                     aria-label="Project title"
                   />
-                  <Description>
-                    Choose a unique name for your project
-                  </Description>
+                  {name.trim() && (
+                    <Description>URL: /{generateSlug(name)}</Description>
+                  )}
                   <FieldError />
                 </TextField>
+
                 <TextField
                   name="description"
                   value={description}

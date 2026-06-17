@@ -4,6 +4,7 @@ import "@/models/User";
 export interface IProject {
   creator: mongoose.Types.ObjectId;
   name: string;
+  slug: string;
   description?: string;
   team: mongoose.Types.ObjectId[];
   createdAt: Date;
@@ -24,10 +25,15 @@ const ProjectSchema = new mongoose.Schema<IProject>(
       minlength: [1, "Project name must be atleast 1 character"],
       maxlength: [200, "Project name cannot exceed 200 characters"],
     },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     description: {
       type: String,
       trim: true,
-      maxlength: [500, "Project description cannot exceed 500 character"],
+      maxlength: [500, "Project description cannot exceed 500 characters"],
     },
     team: [
       {
@@ -41,6 +47,7 @@ const ProjectSchema = new mongoose.Schema<IProject>(
 
 ProjectSchema.index({ creator: 1 });
 ProjectSchema.index({ createdAt: -1 });
+ProjectSchema.index({ creator: 1, slug: 1 }, { unique: true });
 
 export default (mongoose.models.Project as mongoose.Model<IProject>) ||
   mongoose.model<IProject>("Project", ProjectSchema);

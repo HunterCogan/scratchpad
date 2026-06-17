@@ -14,6 +14,7 @@ export type RemixItem = {
   name: string;
   uploaderName: string;
   uploaderId: string;
+  uploaderUsername: string;
   uploaderColor: string;
   uploaderImagePath?: string;
   description: string;
@@ -228,7 +229,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                 {selectedRemix.createdAt} by{" "}
                 <Link
                   target="_blank"
-                  href={`/users/${selectedRemix.uploaderId}`}
+                  href={`/users/${selectedRemix.uploaderUsername}`}
                 >
                   {selectedRemix.uploaderName}
                   <Link.Icon />

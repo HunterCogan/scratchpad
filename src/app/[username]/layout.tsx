@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import ShellLayout from "@/components/ShellLayout";
 
-export default async function ProjectsLayout({
+export default async function UsernameLayout({
   children,
 }: {
   children: React.ReactNode;

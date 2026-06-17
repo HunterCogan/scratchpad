@@ -7,20 +7,17 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 export type UserProject = {
   id: string;
   name: string;
+  slug: string;
   description: string;
   createdAt: string;
 };
 
-function shortProjectId(id: string) {
-  return id.slice(-8, -4) + "-" + id.slice(-4);
-}
-
 function ProjectRow({
   project,
-  userId,
+  username,
 }: {
   project: UserProject;
-  userId: string;
+  username: string;
 }) {
   const router = useRouter();
 
@@ -37,16 +34,13 @@ function ProjectRow({
         </Card.Header>
         <Card.Footer>
           <div className="flex gap-1 flex-wrap">
-            <Chip size="md">ID: {shortProjectId(project.id)}</Chip>
             <Chip size="md">Created: {project.createdAt}</Chip>
           </div>
           <div className="flex gap-1 ml-auto shrink-0">
             <Button
               variant="outline"
               size="sm"
-              onPress={() =>
-                router.push(`/projects/${userId}?projectId=${project.id}`)
-              }
+              onPress={() => router.push(`/${username}/${project.slug}`)}
             >
               <EyeIcon className="h-4 w-4" />
               View
@@ -60,11 +54,11 @@ function ProjectRow({
 
 export default function UserProjectsList({
   projects,
-  userId,
+  username,
   isOwner,
 }: {
   projects: UserProject[];
-  userId: string;
+  username: string;
   isOwner: boolean;
 }) {
   if (projects.length === 0) {
@@ -80,7 +74,7 @@ export default function UserProjectsList({
   return (
     <div className="flex flex-col gap-3">
       {projects.map((project) => (
-        <ProjectRow key={project.id} project={project} userId={userId} />
+        <ProjectRow key={project.id} project={project} username={username} />
       ))}
     </div>
   );

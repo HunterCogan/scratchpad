@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage({
   currentPage = "login",
@@ -31,34 +32,24 @@ export default function LoginPage({
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     setError("");
+
+    if (!validate()) return;
+
     setLoading(true);
 
-    if (!validate()) {
-      setLoading(false);
-      return;
-    }
-
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, rememberMe }),
+    const { error } = await authClient.signIn.email({
+      email,
+      password,
+      rememberMe,
     });
 
     setLoading(false);
 
-    if (res.ok) {
+    if (error) {
+      setError(error.message || "Failed to login");
+    } else {
       router.refresh();
       router.push("/dashboard");
-    } else {
-      let data;
-
-      try {
-        data = await res.json();
-      } catch {
-        data = { error: "Failed to login" };
-      }
-
-      setError(data.error || "Failed to login");
     }
   }
 
@@ -95,7 +86,7 @@ export default function LoginPage({
             <p className="opacity-80 mb-5">Log in to your Scratchpad account</p>
           </>
         ) : (
-          <Label className="text-5xl mb-8">Login</Label>
+          <Label className="text-4xl sm:text-5xl mb-4">Login</Label>
         )}
 
         <Card variant="default" className="shadow-lg w-full max-w-md">

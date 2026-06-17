@@ -19,6 +19,7 @@ type Category = "users" | "projects";
 type UserResult = {
   id: string;
   name: string;
+  username: string;
   email: string;
   projectCount: number;
 };
@@ -26,7 +27,9 @@ type UserResult = {
 type ProjectResult = {
   id: string;
   name: string;
+  slug: string;
   creatorId: string;
+  creatorUsername: string;
   remixCount: number;
 };
 
@@ -159,9 +162,9 @@ export default function GlobalSearch() {
     setQuery("");
 
     if (isUserResult(result)) {
-      router.push(`/users/${result.id}`);
+      router.push(`/${result.username}`);
     } else {
-      router.push(`/projects/${result.creatorId}?projectId=${result.id}`);
+      router.push(`/${result.creatorUsername}/${result.slug}`);
     }
   }
 

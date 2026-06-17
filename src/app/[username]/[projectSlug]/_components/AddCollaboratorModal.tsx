@@ -94,9 +94,16 @@ export default function AddCollaboratorModal({
 
   return (
     <Modal state={state}>
-      <Button isIconOnly isDisabled={isDisabled} variant="secondary" size="sm">
-        <UsersIcon />
-      </Button>
+      <Modal.Trigger>
+        <Button
+          isIconOnly
+          isDisabled={isDisabled}
+          variant="secondary"
+          size="sm"
+        >
+          <UsersIcon />
+        </Button>
+      </Modal.Trigger>
       <Modal.Backdrop>
         <Modal.Container size="md">
           <Modal.Dialog>
@@ -107,6 +114,9 @@ export default function AddCollaboratorModal({
               </Modal.Heading>
             </Modal.Header>
             <Modal.Body>
+              <p className="px-1 mb-2 text-sm">
+                Search for users to add or remove them from this project.
+              </p>
               <div className="max-h-96 overflow-y-auto">
                 <UserSearch
                   teamIds={allTeamIds}

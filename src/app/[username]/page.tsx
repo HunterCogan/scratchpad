@@ -4,37 +4,33 @@ import { headers } from "next/headers";
 import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import UserModel from "@/models/User";
-import mongoose from "mongoose";
 import UserProfile from "./_components/UserProfile";
 
 export default async function UserProfilePage({
   params,
 }: {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ username: string }>;
 }) {
-  const { userId } = await params;
+  const { username } = await params;
   const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    notFound();
-  }
 
   await connectDB();
 
-  const user = await UserModel.findById(userId).lean();
+  const user = await UserModel.findOne({ username }).lean();
   if (!user) {
     notFound();
   }
 
-  const projects = await ProjectModel.find({
-    creator: new mongoose.Types.ObjectId(userId),
-  })
+  const userId = user._id.toString();
+
+  const projects = await ProjectModel.find({ creator: user._id })
     .sort({ createdAt: -1 })
     .lean();
 
   const serializedProjects = projects.map((p) => ({
     id: p._id.toString(),
     name: p.name,
+    slug: p.slug,
     description: p.description ?? "",
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
@@ -46,11 +42,11 @@ export default async function UserProfilePage({
   return (
     <UserProfile
       name={user.name}
+      username={user.username}
       color={user.color ?? "#808080"}
       imagePath={user.imagePath ?? undefined}
       about={user.about ?? ""}
       isOwner={session?.user?.id === userId}
-      userId={userId}
       projects={serializedProjects}
     />
   );

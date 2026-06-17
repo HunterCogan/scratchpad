@@ -4,6 +4,7 @@ import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import RemixModel from "@/models/Remix";
 import mongoose from "mongoose";
+import { generateSlug } from "@/lib/slugify";
 import { ProjectSchema } from "@/lib/schemas/project.zod";
 import z from "zod";
 
@@ -108,6 +109,22 @@ export async function PUT(
 
     if (body.name !== undefined) {
       project.name = body.name;
+
+      const newSlug = generateSlug(body.name);
+      const conflict = await ProjectModel.findOne({
+        creator: project.creator,
+        slug: newSlug,
+        _id: { $ne: project._id },
+      });
+
+      if (conflict) {
+        return NextResponse.json(
+          { error: "You already have a project with a similar name." },
+          { status: 409 },
+        );
+      }
+
+      project.slug = newSlug;
     }
 
     if (body.description !== undefined) {
@@ -120,6 +137,7 @@ export async function PUT(
       {
         success: true,
         project,
+        slug: project.slug,
       },
       {
         status: 200,

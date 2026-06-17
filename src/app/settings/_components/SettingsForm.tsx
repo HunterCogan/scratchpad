@@ -15,9 +15,10 @@ import {
   Modal,
   useOverlayState,
 } from "@heroui/react";
+import Image from "next/image";
 
 type SettingsFormProps = {
-  userId: string;
+  username: string;
   initialName: string;
   initialColor: string;
   initialAbout: string;
@@ -32,7 +33,7 @@ function normalizeHexColor(value: string) {
 }
 
 export default function SettingsForm({
-  userId,
+  username,
   initialName,
   initialColor,
   initialAbout,
@@ -333,7 +334,7 @@ export default function SettingsForm({
               Change Picture
             </Button>
 
-            <Link href={`/users/${userId}`}>
+            <Link href={`/${username}`}>
               <Button variant="secondary" size="sm">
                 View Profile
               </Button>
@@ -476,9 +477,11 @@ export default function SettingsForm({
 
               <Modal.Body>
                 {imageUrl && (
-                  <img
+                  <Image
                     src={imageUrl}
                     alt={name}
+                    width={800}
+                    height={800}
                     className="max-h-[85vh] max-w-full object-contain rounded-lg"
                   />
                 )}

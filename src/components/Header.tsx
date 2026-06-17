@@ -12,12 +12,14 @@ export default async function Header() {
   const userId = session?.user?.id;
 
   let displayName = "";
+  let username = "";
   let color: string | undefined;
   let imagePath: string | undefined;
 
   if (userId) {
     const user = await User.findById(userId).lean();
     displayName = user?.name ?? session?.user?.name ?? "";
+    username = user?.username ?? "";
     color = user?.color;
     imagePath = user?.imagePath ?? undefined;
   }
@@ -37,7 +39,7 @@ export default async function Header() {
             name={displayName}
             color={color}
             imagePath={imagePath}
-            userId={userId}
+            username={username}
           />
         ) : (
           <div className="flex items-center gap-2 shrink-0">

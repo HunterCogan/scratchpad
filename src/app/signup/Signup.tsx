@@ -13,51 +13,69 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { authClient } from "@/lib/auth-client";
 
 export default function Signup() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  async function checkUsername(value: string) {
+    if (!value.trim()) {
+      setUsernameError("");
+      return;
+    }
+    const { data } = await authClient.isUsernameAvailable({ username: value });
+    if (data?.available === false) {
+      setUsernameError("Username is already taken");
+    } else {
+      setUsernameError("");
+    }
+  }
 
   async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     setError("");
+
+    if (!validate()) return;
+
     setLoading(true);
 
-    if (!validate()) {
-      setLoading(false);
-      return;
-    }
-
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const { error } = await authClient.signUp.email({
+      email,
+      password,
+      name: displayName.trim() || username,
+      username,
     });
 
     setLoading(false);
 
-    if (res.ok) {
-      router.push("/dashboard");
+    if (error) {
+      setError(error.message || "Failed to sign up");
     } else {
-      let data;
-
-      try {
-        data = await res.json();
-      } catch {
-        data = { error: "Failed to sign up" };
-      }
-
-      setError(data.error || "Failed to sign up");
+      router.push("/dashboard");
     }
   }
 
   function validate() {
     setError("");
+
+    if (!username.trim()) {
+      setError("Username is required");
+      return false;
+    }
+
+    if (usernameError) {
+      setError("Please choose a different username");
+      return false;
+    }
 
     if (!email.trim()) {
       setError("Email is required");
@@ -91,12 +109,40 @@ export default function Signup() {
     <div className="grid h-screen place-items-center p-12">
       <div className="flex flex-col items-center w-full">
         <div className="flex flex-col items-center w-full">
-          <Label className="text-5xl mb-8">Sign Up</Label>
+          <Label className="text-4xl sm:text-5xl mb-4">Sign Up</Label>
           <Card variant="default" className="shadow-lg w-full max-w-md">
             <Form
               onSubmit={handleSubmit}
               className="justify-center w-full max-w-md gap-6 flex flex-col p-1 sm:p-5"
             >
+              <TextField className="flex flex-col gap-1" isRequired>
+                <Label>Username</Label>
+                <Input
+                  variant="secondary"
+                  value={username}
+                  placeholder="Enter your username"
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    checkUsername(e.target.value);
+                  }}
+                  className="text-sm"
+                />
+                {usernameError && (
+                  <p className="text-red-600 text-sm">{usernameError}</p>
+                )}
+              </TextField>
+
+              <TextField className="flex flex-col gap-1">
+                <Label>Display Name</Label>
+                <Input
+                  variant="secondary"
+                  value={displayName}
+                  placeholder="Enter your display name"
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="text-sm"
+                />
+              </TextField>
+
               <TextField className="flex flex-col gap-1" isRequired>
                 <Label>Email</Label>
                 <Input
@@ -105,6 +151,7 @@ export default function Signup() {
                   value={email}
                   placeholder="Enter your email"
                   onChange={(e) => setEmail(e.target.value)}
+                  className="text-sm"
                 />
               </TextField>
 
@@ -116,6 +163,7 @@ export default function Signup() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="text-sm"
                   />
                   <InputGroup.Suffix className="pr-0">
                     <Button
@@ -142,6 +190,7 @@ export default function Signup() {
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="text-sm"
                 />
               </TextField>
 

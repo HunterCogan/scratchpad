@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 export interface IUser {
   name: string;
   email: string;
+  username: string;
+  displayUsername: string;
   color: string;
   about: string;
   imagePath?: string | null;
@@ -15,6 +17,8 @@ const UserSchema = new mongoose.Schema<IUser>(
   {
     name: String,
     email: String,
+    username: { type: String, unique: true, sparse: true },
+    displayUsername: String,
     color: { type: String, default: "#808080" },
     about: { type: String, default: "" },
     imagePath: {

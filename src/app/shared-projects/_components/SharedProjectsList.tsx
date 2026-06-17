@@ -10,7 +10,8 @@ type CollaboratingProject = {
   description: string;
   createdAt: string;
   ownerName: string;
-  ownerId: string;
+  ownerUsername: string;
+  slug: string;
 };
 
 type SharingProject = {
@@ -19,6 +20,7 @@ type SharingProject = {
   description: string;
   createdAt: string;
   teamCount: number;
+  slug: string;
 };
 
 function CollaboratingRow({ project }: { project: CollaboratingProject }) {
@@ -45,9 +47,7 @@ function CollaboratingRow({ project }: { project: CollaboratingProject }) {
               variant="outline"
               size="sm"
               onPress={() =>
-                router.push(
-                  `/projects/${project.ownerId}?projectId=${project.id}`,
-                )
+                router.push(`/${project.ownerUsername}/${project.slug}`)
               }
             >
               <EyeIcon className="h-4 w-4" />
@@ -62,10 +62,10 @@ function CollaboratingRow({ project }: { project: CollaboratingProject }) {
 
 function SharingRow({
   project,
-  userId,
+  username,
 }: {
   project: SharingProject;
-  userId: string;
+  username: string;
 }) {
   const router = useRouter();
 
@@ -93,9 +93,7 @@ function SharingRow({
             <Button
               variant="outline"
               size="sm"
-              onPress={() =>
-                router.push(`/projects/${userId}?projectId=${project.id}`)
-              }
+              onPress={() => router.push(`/${username}/${project.slug}`)}
             >
               <EyeIcon className="h-4 w-4" />
               View
@@ -110,28 +108,29 @@ function SharingRow({
 export default function SharedProjectsList({
   collaborating,
   sharing,
-  userId,
+  username,
 }: {
   collaborating: CollaboratingProject[];
   sharing: SharingProject[];
-  userId: string;
+  username: string;
 }) {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold">Shared with Me</h1>
-          <p className="text-sm mt-0.5">
-            Projects you&apos;ve been added to as a collaborator
-          </p>
+          {collaborating.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              You haven&apos;t been added to any projects yet.
+            </p>
+          ) : (
+            <p className="text-sm mt-0.5">
+              Projects you&apos;ve been added to as a collaborator
+            </p>
+          )}
         </div>
-        {collaborating.length === 0 ? (
-          <p className="text-sm">
-            You haven&apos;t been added to any projects yet.
-          </p>
-        ) : (
-          collaborating.map((p) => <CollaboratingRow key={p.id} project={p} />)
-        )}
+        {collaborating.length > 0 &&
+          collaborating.map((p) => <CollaboratingRow key={p.id} project={p} />)}
       </section>
 
       <Separator />
@@ -139,19 +138,20 @@ export default function SharedProjectsList({
       <section className="flex flex-col gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold">My Shared Projects</h2>
-          <p className="text-sm mt-0.5">
-            Your projects that have collaborators
-          </p>
+          {sharing.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              You haven&apos;t shared any projects with others yet.
+            </p>
+          ) : (
+            <p className="text-sm mt-0.5">
+              Your projects that have collaborators
+            </p>
+          )}
         </div>
-        {sharing.length === 0 ? (
-          <p className="text-sm">
-            You haven&apos;t shared any projects with others yet.
-          </p>
-        ) : (
+        {sharing.length > 0 &&
           sharing.map((p) => (
-            <SharingRow key={p.id} project={p} userId={userId} />
-          ))
-        )}
+            <SharingRow key={p.id} project={p} username={username} />
+          ))}
       </section>
     </div>
   );

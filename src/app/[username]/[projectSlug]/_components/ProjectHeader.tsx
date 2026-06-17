@@ -31,6 +31,7 @@ import { ProjectSchema } from "@/lib/schemas/project.zod";
 interface TeamMember {
   id: string;
   name: string;
+  username?: string;
   color: string;
   imagePath?: string;
 }
@@ -38,6 +39,8 @@ interface TeamMember {
 interface ProjectHeaderProps {
   projectId: string;
   creatorId: string;
+  creatorUsername: string;
+  slug: string;
   userId: string | undefined;
   initialName: string;
   initialDescription: string;
@@ -52,6 +55,8 @@ interface ProjectHeaderProps {
 export function ProjectHeader({
   projectId,
   creatorId,
+  creatorUsername,
+  slug,
   userId,
   initialName,
   initialDescription,
@@ -87,6 +92,7 @@ export function ProjectHeader({
     {
       id: creatorId,
       name: creatorName,
+      username: creatorUsername,
       color: creatorColor,
       imagePath: creatorImagePath,
     },
@@ -119,10 +125,16 @@ export function ProjectHeader({
       });
 
       if (res.ok) {
+        const data = await res.json();
         savedRef.current = { name, description };
+
+        if (data.slug && data.slug !== slug) {
+          router.push(`/${creatorUsername}/${data.slug}`);
+        }
       } else {
         const { error } = await res.json().catch(() => ({}));
         setSaveError(typeof error === "string" ? error : "Failed to save");
+        setName(savedRef.current.name);
       }
     } catch {
       setSaveError("Failed to save");
@@ -218,10 +230,10 @@ export function ProjectHeader({
               <Link
                 key={member.id}
                 target="_blank"
-                href={`/users/${member.id}`}
+                href={`/${member.username ?? member.id}`}
               >
                 <Tooltip delay={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger tabIndex={0}>
                     <Avatar className="ring-2 ring-white">
                       {member.imagePath && (
                         <Avatar.Image
@@ -246,7 +258,7 @@ export function ProjectHeader({
             ))}
             {sortedTeam.length - 3 > 0 && (
               <Dropdown>
-                <Dropdown.Trigger>
+                <Dropdown.Trigger className="flex">
                   <Avatar className="ring-2 ring-white">
                     <Avatar.Fallback className="text-xs select-none">
                       +{sortedTeam.length - 3}
@@ -261,7 +273,7 @@ export function ProjectHeader({
                         <Dropdown.Item
                           key={member.id}
                           target="_blank"
-                          href={`/users/${member.id}`}
+                          href={`/${member.username ?? member.id}`}
                         >
                           {member.name}
                         </Dropdown.Item>
@@ -296,78 +308,81 @@ export function ProjectHeader({
               creatorId={creatorId}
             ></CreateRemixModal>
             <ButtonGroup>
-              <AddCollaboratorModal
-                projectId={projectId}
-                creatorId={creatorId}
-                isDisabled={userId !== creatorId}
-                teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
-                onMemberAdded={handleMemberAdded}
-                onMemberRemoved={handleMemberRemoved}
-              />
-              <AlertDialog
-                isOpen={leaveState.isOpen}
-                onOpenChange={leaveState.setOpen}
-              >
-                <Button
-                  isIconOnly
-                  onPress={leaveState.open}
-                  variant="secondary"
-                  size="sm"
-                  isDisabled={userId === creatorId}
+              {userId === creatorId && (
+                <AddCollaboratorModal
+                  projectId={projectId}
+                  creatorId={creatorId}
+                  isDisabled={userId !== creatorId}
+                  teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
+                  onMemberAdded={handleMemberAdded}
+                  onMemberRemoved={handleMemberRemoved}
+                />
+              )}
+              {userId !== creatorId && (
+                <AlertDialog
+                  isOpen={leaveState.isOpen}
+                  onOpenChange={leaveState.setOpen}
                 >
-                  <ButtonGroup.Separator />
-                  <UserMinusIcon />
-                </Button>
+                  <Button
+                    isIconOnly
+                    onPress={leaveState.open}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    <ButtonGroup.Separator />
+                    <UserMinusIcon />
+                  </Button>
 
-                <AlertDialog.Backdrop>
-                  <AlertDialog.Container>
-                    <AlertDialog.Dialog>
-                      <AlertDialog.CloseTrigger className="m-3" />
+                  <AlertDialog.Backdrop>
+                    <AlertDialog.Container>
+                      <AlertDialog.Dialog>
+                        <AlertDialog.CloseTrigger className="m-3" />
 
-                      <AlertDialog.Header>
-                        <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
-                          <AlertDialog.Icon />
-                          Leave Project?
-                        </AlertDialog.Heading>
-                      </AlertDialog.Header>
+                        <AlertDialog.Header>
+                          <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                            <AlertDialog.Icon />
+                            Leave Project?
+                          </AlertDialog.Heading>
+                        </AlertDialog.Header>
 
-                      <AlertDialog.Body>
-                        {team.length === 0 ? (
-                          <p>
-                            <strong>{name}</strong> will be permanently deleted.
-                            This cannot be undone.
-                          </p>
-                        ) : (
-                          <p>
-                            You will no longer be able to contribute to this
-                            project.
-                          </p>
-                        )}
-                        {leaveError && (
-                          <p className="text-red-500 text-sm mt-2">
-                            {leaveError}
-                          </p>
-                        )}
-                      </AlertDialog.Body>
+                        <AlertDialog.Body>
+                          {team.length === 0 ? (
+                            <p>
+                              <strong>{name}</strong> will be permanently
+                              deleted. This cannot be undone.
+                            </p>
+                          ) : (
+                            <p>
+                              You will no longer be able to contribute to this
+                              project.
+                            </p>
+                          )}
+                          {leaveError && (
+                            <p className="text-red-500 text-sm mt-2">
+                              {leaveError}
+                            </p>
+                          )}
+                        </AlertDialog.Body>
 
-                      <AlertDialog.Footer>
-                        <Button variant="tertiary" onPress={leaveState.close}>
-                          Cancel
-                        </Button>
+                        <AlertDialog.Footer>
+                          <Button variant="tertiary" onPress={leaveState.close}>
+                            Cancel
+                          </Button>
 
-                        <Button
-                          variant="danger"
-                          isDisabled={loading}
-                          onPress={handleLeaveProject}
-                        >
-                          {loading && <Spinner size="sm" />}
-                          {loading ? "Leaving..." : "Leave"}
-                        </Button>
-                      </AlertDialog.Footer>
-                    </AlertDialog.Dialog>
-                  </AlertDialog.Container>
-                </AlertDialog.Backdrop>
-              </AlertDialog>
+                          <Button
+                            variant="danger"
+                            isDisabled={loading}
+                            onPress={handleLeaveProject}
+                          >
+                            {loading && <Spinner size="sm" />}
+                            {loading ? "Leaving..." : "Leave"}
+                          </Button>
+                        </AlertDialog.Footer>
+                      </AlertDialog.Dialog>
+                    </AlertDialog.Container>
+                  </AlertDialog.Backdrop>
+                </AlertDialog>
+              )}
             </ButtonGroup>
           </div>
         )}

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       const users = await UserModel.find({
         $or: [{ name: regex }, { email: regex }],
       })
-        .select("_id name email")
+        .select("_id name email username")
         .limit(8)
         .lean();
 
@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
       const results = users.map((u) => ({
         id: u._id.toString(),
         name: u.name,
+        username: u.username,
         email: u.email,
         projectCount: countMap.get(u._id.toString()) ?? 0,
       }));
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const projects = await ProjectModel.find({ name: regex })
-      .select("_id name creator")
+      .select("_id name slug creator")
       .limit(8)
       .lean();
 
@@ -69,10 +70,23 @@ export async function GET(request: NextRequest) {
       remixCounts.map((r) => [r._id.toString(), r.count]),
     );
 
+    const creatorIds = [...new Set(projects.map((p) => p.creator.toString()))];
+    const creators = await UserModel.find({
+      _id: { $in: creatorIds },
+    })
+      .select("_id username")
+      .lean();
+
+    const creatorUsernameMap = new Map(
+      creators.map((c) => [c._id.toString(), c.username]),
+    );
+
     const results = projects.map((p) => ({
       id: p._id.toString(),
       name: p.name,
+      slug: p.slug,
       creatorId: p.creator.toString(),
+      creatorUsername: creatorUsernameMap.get(p.creator.toString()) ?? "",
       remixCount: countMap.get(p._id.toString()) ?? 0,
     }));
 

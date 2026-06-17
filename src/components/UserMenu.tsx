@@ -7,12 +7,12 @@ export default function UserMenu({
   name,
   color,
   imagePath,
-  userId,
+  username,
 }: {
   name: string;
   color: string | undefined;
   imagePath: string | undefined;
-  userId: string;
+  username: string;
 }) {
   const initial = name.substring(0, 2).toUpperCase();
   const imageUrl = imagePath
@@ -23,16 +23,19 @@ export default function UserMenu({
     <div className="relative">
       <Dropdown>
         <Dropdown.Trigger>
-          <Avatar className="cursor-pointer">
-            <Avatar.Image src={imageUrl} alt={name} />
-            <Avatar.Fallback style={{ backgroundColor: color }}>
+          <Avatar className="cursor-pointer ring-2 ring-white">
+            {imageUrl && <Avatar.Image src={imageUrl} alt={name} />}
+            <Avatar.Fallback
+              className="font-sans"
+              style={{ backgroundColor: color }}
+            >
               {initial}
             </Avatar.Fallback>
           </Avatar>
         </Dropdown.Trigger>
         <Dropdown.Popover placement="bottom end">
           <Dropdown.Menu>
-            <Dropdown.Item href={`/users/${userId}`}>My profile</Dropdown.Item>
+            <Dropdown.Item href={`/${username}`}>My profile</Dropdown.Item>
             <Dropdown.Item href="/settings">Settings</Dropdown.Item>
             <Dropdown.Item onPress={() => logout()} className="text-red-400">
               Logout

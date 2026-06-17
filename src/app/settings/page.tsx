@@ -29,7 +29,7 @@ export default async function SettingsPage() {
           </p>
         </div>
         <SettingsForm
-          userId={session.userId}
+          username={user.username}
           initialName={user.name}
           initialColor={user.color ?? "#808080"}
           initialAbout={user.about ?? ""}

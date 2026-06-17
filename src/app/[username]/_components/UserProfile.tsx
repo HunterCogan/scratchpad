@@ -5,19 +5,19 @@ import UserProjectsList, { type UserProject } from "./UserProjectsList";
 
 export default function UserProfile({
   name,
+  username,
   color,
   imagePath,
   about,
   isOwner,
-  userId,
   projects,
 }: {
   name: string;
+  username: string;
   color: string;
   imagePath: string | undefined;
   about: string;
   isOwner: boolean;
-  userId: string;
   projects: UserProject[];
 }) {
   const imageUrl = imagePath
@@ -32,13 +32,15 @@ export default function UserProfile({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar size="lg">
-              {imagePath && <Avatar.Image src={imageUrl!} alt={name} />}
-
+              <Avatar.Image src={imageUrl} alt={name} />
               <Avatar.Fallback style={{ backgroundColor: color }}>
                 {initial}
               </Avatar.Fallback>
             </Avatar>
-            <h1 className="text-2xl sm:text-2xl font-bold">{name}</h1>
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold">{name}</h1>
+              <p className="text-sm text-default-500">@{username}</p>
+            </div>
           </div>
           {isOwner && (
             <Link href="/settings" className="shrink-0">
@@ -67,7 +69,7 @@ export default function UserProfile({
           <h2 className="text-lg font-semibold">Projects</h2>
           <UserProjectsList
             projects={projects}
-            userId={userId}
+            username={username}
             isOwner={isOwner}
           />
         </section>

@@ -15,18 +15,20 @@ import { useState } from "react";
 type Project = {
   id: string;
   name: string;
+  slug: string;
   description: string;
   createdAt: string;
 };
 
-// Shortens the project ID to look better (can be changed in the future)
-function shortProjectId(id: string) {
-  return id.slice(-8, -4) + "-" + id.slice(-4);
-}
-
 // A List of all the projects for a user. Has View button which goes to the project page,
 // and Delete button which opens a confirmation dialog before deleting the project.
-function ProjectRow({ project, userId }: { project: Project; userId: string }) {
+function ProjectRow({
+  project,
+  username,
+}: {
+  project: Project;
+  username: string;
+}) {
   const router = useRouter();
   const deleteState = useOverlayState();
   const [loading, setLoading] = useState(false);
@@ -68,16 +70,13 @@ function ProjectRow({ project, userId }: { project: Project; userId: string }) {
         </Card.Header>
         <Card.Footer className="flex-col items-start gap-2 sm:flex-row sm:items-center">
           <div className="flex gap-1 flex-wrap">
-            <Chip size="md">ID: {shortProjectId(project.id)}</Chip>
             <Chip size="md">Created: {project.createdAt}</Chip>
           </div>
           <div className="flex gap-1 sm:ml-auto shrink-0">
             <Button
               variant="outline"
               size="sm"
-              onPress={() =>
-                router.push(`/projects/${userId}?projectId=${project.id}`)
-              }
+              onPress={() => router.push(`/${username}/${project.slug}`)}
             >
               <EyeIcon className="h-4 w-4" />
               View
@@ -132,10 +131,10 @@ function ProjectRow({ project, userId }: { project: Project; userId: string }) {
 
 export default function ProjectList({
   projects,
-  userId,
+  username,
 }: {
   projects: Project[];
-  userId: string;
+  username: string;
 }) {
   if (projects.length === 0) {
     return (
@@ -146,7 +145,7 @@ export default function ProjectList({
   return (
     <div className="flex flex-col gap-3">
       {projects.map((p) => (
-        <ProjectRow key={p.id} project={p} userId={userId} />
+        <ProjectRow key={p.id} project={p} username={username} />
       ))}
     </div>
   );

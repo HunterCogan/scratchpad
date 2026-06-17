@@ -1,31 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type Project = {
   id: string;
   name: string;
+  slug: string;
 };
 
 type SharedProject = {
   id: string;
   name: string;
   creatorId: string;
+  creatorUsername: string;
+  slug: string;
 };
 
 export default function NavbarClient({
   projects,
-  userId,
+  username,
   sharedProjects,
 }: {
   projects: Project[];
-  userId: string;
+  username: string;
   sharedProjects: SharedProject[];
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const activeProjectId = searchParams.get("projectId");
 
   return (
     <nav className="flex flex-col p-3 h-full">
@@ -68,9 +69,9 @@ export default function NavbarClient({
           {projects.map((p) => (
             <Link
               key={p.id}
-              href={`/projects/${userId}?projectId=${p.id}`}
+              href={`/${username}/${p.slug}`}
               className={`block px-3 py-1.5 rounded-md text-sm truncate transition-colors ${
-                pathname === `/projects/${userId}` && activeProjectId === p.id
+                pathname === `/${username}/${p.slug}`
                   ? "bg-nav-item-active text-nav-text"
                   : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
               }`}
@@ -89,10 +90,9 @@ export default function NavbarClient({
           {sharedProjects.map((p) => (
             <Link
               key={p.id}
-              href={`/projects/${p.creatorId}?projectId=${p.id}`}
+              href={`/${p.creatorUsername}/${p.slug}`}
               className={`block px-3 py-1.5 rounded-md text-sm truncate transition-colors ${
-                pathname === `/projects/${p.creatorId}` &&
-                activeProjectId === p.id
+                pathname === `/${p.creatorUsername}/${p.slug}`
                   ? "bg-nav-item-active text-nav-text"
                   : "text-nav-text hover:bg-nav-item-hover hover:text-nav-text"
               }`}

@@ -1,6 +1,7 @@
 import { verifySession } from "@/lib/dal";
 import connectDB from "@/lib/db";
 import Project from "@/models/Project";
+import UserModel from "@/models/User";
 import mongoose from "mongoose";
 import SharedProjectsList from "./_components/SharedProjectsList";
 
@@ -8,11 +9,13 @@ type CollaboratingResult = {
   _id: mongoose.Types.ObjectId;
   name: string;
   description?: string;
+  slug: string;
   creator: mongoose.Types.ObjectId | string;
   team: (mongoose.Types.ObjectId | string)[];
   createdAt: Date;
   creatorInfo?: {
     name: string;
+    username: string;
   };
 };
 
@@ -22,7 +25,8 @@ export default async function SharedProjectsPage() {
 
   const objectId = new mongoose.Types.ObjectId(userId);
 
-  const [collaboratingRaw, sharingRaw] = await Promise.all([
+  const [currentUser, collaboratingRaw, sharingRaw] = await Promise.all([
+    UserModel.findById(objectId).select("username").lean(),
     Project.aggregate<CollaboratingResult>([
       {
         $match: {
@@ -40,7 +44,7 @@ export default async function SharedProjectsPage() {
           let: { cid: { $toString: "$creator" } },
           pipeline: [
             { $match: { $expr: { $eq: [{ $toString: "$_id" }, "$$cid"] } } },
-            { $project: { name: 1 } },
+            { $project: { name: 1, username: 1 } },
           ],
           as: "creatorData",
         },
@@ -53,9 +57,12 @@ export default async function SharedProjectsPage() {
       .lean(),
   ]);
 
+  const username = currentUser?.username ?? "";
+
   const collaborating = collaboratingRaw.map((p) => ({
     id: p._id.toString(),
     name: p.name,
+    slug: p.slug,
     description: p.description ?? "",
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
@@ -63,12 +70,13 @@ export default async function SharedProjectsPage() {
       year: "numeric",
     }),
     ownerName: p.creatorInfo?.name ?? "Unknown",
-    ownerId: p.creator.toString(),
+    ownerUsername: p.creatorInfo?.username ?? "",
   }));
 
   const sharing = sharingRaw.map((p) => ({
     id: p._id.toString(),
     name: p.name,
+    slug: p.slug,
     description: p.description ?? "",
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
@@ -84,7 +92,7 @@ export default async function SharedProjectsPage() {
         <SharedProjectsList
           collaborating={collaborating}
           sharing={sharing}
-          userId={userId}
+          username={username}
         />
       </main>
     </div>

@@ -4,7 +4,6 @@ import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import RemixModel, { type IProgramFile } from "@/models/Remix";
 import UserModel from "@/models/User";
-import mongoose from "mongoose";
 import { redirect } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import { ProjectHeader } from "./_components/ProjectHeader";
@@ -24,63 +23,54 @@ function formatTimestamp(date: Date): string {
 
 export default async function ProjectPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ userId: string }>;
-  searchParams: Promise<{ projectId?: string }>;
+  params: Promise<{ username: string; projectSlug: string }>;
 }) {
-  const { userId } = await params;
-  const { projectId } = await searchParams;
+  const { username, projectSlug } = await params;
 
   const session = await auth.api.getSession({ headers: await headers() });
   await connectDB();
 
-  const homePage = session?.session.userId ? "dashboard" : "";
+  const homePage = session?.session?.userId ? "dashboard" : "";
 
-  if (!userId || !mongoose.isValidObjectId(userId))
-    redirect(`/${homePage}?error=invalid-user`);
+  const creator = await UserModel.findOne({ username }).lean();
+  if (!creator) redirect(`/${homePage}?error=invalid-user`);
 
-  if (!projectId || !mongoose.isValidObjectId(projectId))
-    redirect(`/${homePage}?error=invalid-project`);
-
-  // populate the "name" field from each User object in team for displaying Avatars
   const project = await ProjectModel.findOne({
-    _id: new mongoose.Types.ObjectId(projectId),
-    creator: new mongoose.Types.ObjectId(userId),
+    creator: creator._id,
+    slug: projectSlug,
   })
     .populate<{
       team: {
-        _id: mongoose.Types.ObjectId;
+        _id: import("mongoose").Types.ObjectId;
         name: string;
+        username?: string;
         color: string;
         imagePath?: string | null;
       }[];
-    }>("team", "name color imagePath")
+    }>("team", "name username color imagePath")
     .lean();
 
   if (!project) redirect(`/${homePage}?error=project-not-found`);
 
-  const creator = await UserModel.findById(userId).lean();
-
-  // populate the "name" field for the uploader of each Remix to pass to ProjectContent, used for Avatars and displaying usernames
   const remixes = await RemixModel.find({ project: project._id })
     .sort({ createdAt: -1 })
     .populate<{
       uploader: {
-        _id: mongoose.Types.ObjectId;
+        _id: import("mongoose").Types.ObjectId;
         name: string;
+        username: string;
         color: string;
         imagePath?: string | null;
       };
-    }>("uploader", "name color imagePath")
+    }>("uploader", "name username color imagePath")
     .lean();
 
-  // serialization to RemixItem needed since ProjectContent is a client component
-  // currently, "asset" files are disregarded, with the "logic" file saved to projectJsonData
   const serializedRemixes: RemixItem[] = remixes.map((remix) => ({
     id: remix._id.toString(),
     name: remix.name,
     uploaderName: remix.uploader?.name ?? "Unknown",
+    uploaderUsername: remix.uploader?.username ?? "",
     uploaderColor: remix.uploader?.color ?? "#808080",
     uploaderImagePath: remix.uploader?.imagePath ?? undefined,
     uploaderId: remix.uploader?._id.toString()
@@ -93,12 +83,14 @@ export default async function ProjectPage({
     createdAt: formatTimestamp(remix.createdAt),
   }));
 
+  const creatorId = creator._id.toString();
+
   return (
     <div className="font-sans h-[calc(100vh-3.5rem)] flex flex-col overflow-hidden">
       <main className="px-3 sm:px-6 py-4 sm:py-8 flex flex-col gap-6 flex-1 min-h-0">
         <ProjectHeader
           projectId={project._id.toString()}
-          creatorId={userId}
+          creatorId={creatorId}
           userId={session?.user?.id}
           initialName={project.name}
           initialDescription={project.description ?? ""}
@@ -111,16 +103,19 @@ export default async function ProjectPage({
           team={project.team.map((m) => ({
             id: m._id.toString(),
             name: m.name,
+            username: m.username,
             color: m.color,
             imagePath: m.imagePath ?? undefined,
           }))}
-          creatorName={creator?.name ?? ""}
-          creatorColor={creator?.color ?? ""}
-          creatorImagePath={creator?.imagePath ?? undefined}
+          creatorName={creator.name ?? ""}
+          creatorUsername={creator.username ?? ""}
+          slug={project.slug}
+          creatorColor={creator.color ?? ""}
+          creatorImagePath={creator.imagePath ?? undefined}
         />
         <Separator />
         <ProjectContent
-          creatorId={userId}
+          creatorId={creatorId}
           userId={session?.user?.id}
           remixes={serializedRemixes}
         />
