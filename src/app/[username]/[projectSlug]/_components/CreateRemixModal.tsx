@@ -94,7 +94,7 @@ export default function CreateRemixModal({
 
   return (
     <Modal state={state}>
-      <Button>
+      <Button size="sm">
         <PlusIcon />
         Remix
       </Button>
