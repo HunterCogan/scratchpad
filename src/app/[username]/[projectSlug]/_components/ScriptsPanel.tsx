@@ -144,14 +144,16 @@ export function ScriptsPanel({
                                             <Button
                                               slot="trigger"
                                               variant="secondary"
-                                              className="flex bg-transparent justify-between text-danger"
+                                              className="flex h-auto min-h-fit whitespace-normal bg-transparent justify-between gap-2 text-left text-danger"
                                               fullWidth
                                             >
-                                              <div className="flex w-full items-center justify-start gap-2">
-                                                <ExclamationTriangleIcon />
-                                                {issue.title}
+                                              <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
+                                                <ExclamationTriangleIcon className="size-5 shrink-0" />
+                                                <span className="min-w-0 whitespace-normal break-words text-left">
+                                                  {issue.title}
+                                                </span>
                                               </div>
-                                              <Disclosure.Indicator />
+                                              <Disclosure.Indicator className="shrink-0" />
                                             </Button>
                                           </Disclosure.Heading>
                                           <Disclosure.Content>
@@ -183,14 +185,16 @@ export function ScriptsPanel({
                                               <Button
                                                 slot="trigger"
                                                 variant="secondary"
-                                                className="flex bg-transparent justify-between text-foreground"
+                                                className="flex h-auto min-h-fit whitespace-normal bg-transparent justify-between gap-2 text-left text-foreground"
                                                 fullWidth
                                               >
-                                                <div className="flex w-full items-center justify-start gap-2">
-                                                  <LightBulbIcon />
-                                                  {suggestion.title}
+                                                <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
+                                                  <LightBulbIcon className="size-5 shrink-0" />
+                                                  <span className="min-w-0 whitespace-normal break-words text-left">
+                                                    {suggestion.title}
+                                                  </span>
                                                 </div>
-                                                <Disclosure.Indicator />
+                                                <Disclosure.Indicator className="shrink-0" />
                                               </Button>
                                             </Disclosure.Heading>
                                             <Disclosure.Content>
@@ -396,9 +400,11 @@ export function ScriptsPanel({
               </ComboBox.Popover>
             </ComboBox>
           </div>
-          <div className="flex flex-wrap justify-around gap-3 p-3">
+          <div className="columns-[320px] gap-3 p-3">
             {targetScripts.map((script) => (
-              <ScriptStack key={script.hatBlockId} script={script} />
+              <div key={script.hatBlockId} className="break-inside-avoid mb-3">
+                <ScriptStack script={script} />
+              </div>
             ))}
           </div>
         </Surface>
