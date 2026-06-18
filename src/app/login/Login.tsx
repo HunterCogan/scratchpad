@@ -113,6 +113,7 @@ export default function LoginPage({
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="rounded-tl-[inherit] rounded-bl-[inherit]"
                 />
                 <InputGroup.Suffix className="pr-0">
                   <Button
