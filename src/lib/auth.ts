@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import connectDB from "./db";
-import { resend } from "@/lib/email";
+import { resend } from "@/lib/resend";
 
 // Establish MongoDB connection once the module loads
 const conn = await connectDB();

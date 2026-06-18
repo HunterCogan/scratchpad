@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import EmailVerification from "../../verify-email/EmailVerification";
+import EmailVerification from "./verify-email/EmailVerification";
 import {
   Avatar,
   Button,
@@ -45,21 +45,26 @@ export default function SettingsForm({
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
   const [about, setAbout] = useState(initialAbout);
+
   const [profileError, setProfileError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const passwordState = useOverlayState();
   const deleteState = useOverlayState();
+  const verifyEmailState = useOverlayState();
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showVerification, setShowVerification] = useState(false);
-
   const [deletePassword, setDeletePassword] = useState("");
+
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePath, setImagePath] = useState(initialImagePath);
@@ -447,23 +452,11 @@ export default function SettingsForm({
               Delete Account
             </Button>
 
-            <Button
-              variant="tertiary"
-              onPress={() => setShowVerification(!showVerification)}
-            >
+            <Button variant="tertiary" onPress={() => verifyEmailState.open()}>
               Verify Email
             </Button>
 
-            {showVerification && (
-              <div className="fixed inset-0 z-50">
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
-
-                {/* dropdown panel */}
-                <div className="relative w-full bg-transparent animate-slideDown">
-                  <EmailVerification email={email} />
-                </div>
-              </div>
-            )}
+            <EmailVerification email={email} state={verifyEmailState} />
           </div>
         </div>
 
