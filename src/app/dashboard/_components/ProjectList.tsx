@@ -6,11 +6,14 @@ import {
   Button,
   Card,
   Chip,
+  Input,
+  ListBox,
+  Select,
   Spinner,
   useOverlayState,
 } from "@heroui/react";
 import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Project = {
   id: string;
@@ -18,6 +21,7 @@ type Project = {
   slug: string;
   description: string;
   createdAt: string;
+  createdAtRaw: string;
 };
 
 // A List of all the projects for a user. Has View button which goes to the project page,
@@ -136,6 +140,38 @@ export default function ProjectList({
   projects: Project[];
   username: string;
 }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+
+  const displayedProjects = useMemo(() => {
+    const filtered = projects.filter((project) =>
+      project.name.toLowerCase().startsWith(searchQuery.trim().toLowerCase()),
+    );
+
+    switch (sortBy) {
+      case "oldest":
+        return [...filtered].sort(
+          (a, b) =>
+            new Date(a.createdAtRaw).getTime() -
+            new Date(b.createdAtRaw).getTime(),
+        );
+
+      case "name-asc":
+        return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+
+      case "name-desc":
+        return [...filtered].sort((a, b) => b.name.localeCompare(a.name));
+
+      case "newest":
+      default:
+        return [...filtered].sort(
+          (a, b) =>
+            new Date(b.createdAtRaw).getTime() -
+            new Date(a.createdAtRaw).getTime(),
+        );
+    }
+  }, [projects, searchQuery, sortBy]);
+
   if (projects.length === 0) {
     return (
       <p className="text-sm">No Projects yet. Create one to get started.</p>
@@ -144,9 +180,55 @@ export default function ProjectList({
 
   return (
     <div className="flex flex-col gap-3">
-      {projects.map((p) => (
-        <ProjectRow key={p.id} project={p} username={username} />
-      ))}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Input
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1"
+        />
+
+        <Select
+          value={sortBy}
+          variant="secondary"
+          onChange={(val) => setSortBy(String(val))}
+          aria-label="Sort projects"
+          className="sm:w-52"
+        >
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="newest" textValue="Newest">
+                Newest
+              </ListBox.Item>
+
+              <ListBox.Item id="oldest" textValue="Oldest">
+                Oldest
+              </ListBox.Item>
+
+              <ListBox.Item id="name-asc" textValue="Name (A-Z)">
+                Name (A-Z)
+              </ListBox.Item>
+
+              <ListBox.Item id="name-desc" textValue="Name (Z-A)">
+                Name (Z-A)
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
+      </div>
+
+      {displayedProjects.length === 0 ? (
+        <p className="text-sm">No projects match your search.</p>
+      ) : (
+        displayedProjects.map((p) => (
+          <ProjectRow key={p.id} project={p} username={username} />
+        ))
+      )}
     </div>
   );
 }

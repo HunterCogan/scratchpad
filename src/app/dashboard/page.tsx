@@ -29,6 +29,7 @@ export default async function DashboardPage() {
       day: "numeric",
       year: "numeric",
     }),
+    createdAtRaw: p.createdAt.toISOString(),
   }));
 
   return (
