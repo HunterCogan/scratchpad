@@ -54,7 +54,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
-        from: "MixGit <onboarding@resend.dev>",
+        from: "MixGit <noreply@mixgit.tech>",
         to: [user.email],
         subject: "Verify your email",
         html: `
