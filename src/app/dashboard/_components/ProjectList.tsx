@@ -22,6 +22,7 @@ type Project = {
   description: string;
   createdAt: string;
   createdAtRaw: string;
+  visibility: string;
 };
 
 // A List of all the projects for a user. Has View button which goes to the project page,
@@ -65,7 +66,19 @@ function ProjectRow({
     <Card className="w-full items-stretch flex-row">
       <div className="flex flex-1 flex-col gap-3">
         <Card.Header>
-          <Card.Title>{project.name}</Card.Title>
+          <div className="flex items-center justify-between w-full gap-2">
+            <Card.Title>{project.name}</Card.Title>
+
+            <Chip
+              size="sm"
+              variant={
+                project.visibility === "private" ? "primary" : "secondary"
+              }
+            >
+              {project.visibility === "private" ? "Private" : "Public"}
+            </Chip>
+          </div>
+
           <Card.Description>
             {project.description.length > 0
               ? project.description
