@@ -28,6 +28,7 @@ interface Props {
   userId: string | undefined;
   remixes: RemixItem[];
   visibility: "public" | "private";
+  projectId: string;
 }
 
 export function ProjectContent({
@@ -35,6 +36,7 @@ export function ProjectContent({
   userId,
   remixes,
   visibility,
+  projectId,
 }: Props) {
   const router = useRouter();
   const defaultId = (remixes.find((r) => r.isMain) ?? remixes[0])?.id ?? null;
@@ -221,6 +223,7 @@ export function ProjectContent({
             remixDescription={selectedRemix?.description ?? null}
             feedbackTimestamp={feedbackTimestamp}
             visibility={visibility}
+            projectId={projectId}
             canDelete={
               selectedRemix !== null &&
               (userId === creatorId || userId === selectedRemix.uploaderId)

@@ -131,6 +131,10 @@ export async function PUT(
       project.description = body.description;
     }
 
+    if (body.visibility !== undefined) {
+      project.visibility = body.visibility;
+    }
+
     await project.save();
 
     return NextResponse.json(

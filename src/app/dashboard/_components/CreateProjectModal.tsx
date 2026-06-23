@@ -38,7 +38,7 @@ export default function CreateProjectModal() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [visibility, setVisibility] = useState(false);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,7 +53,7 @@ export default function CreateProjectModal() {
         body: JSON.stringify({
           name,
           description,
-          visibility: visibility ? "private" : "public",
+          visibility,
         }),
       });
 
@@ -153,14 +153,20 @@ export default function CreateProjectModal() {
                 <Label>Visibility</Label>
 
                 <Button
-                  variant={visibility ? "primary" : "secondary"}
-                  onPress={() => setVisibility(!visibility)}
+                  variant={visibility === "private" ? "primary" : "secondary"}
+                  onPress={() =>
+                    setVisibility((prev) =>
+                      prev === "public" ? "private" : "public",
+                    )
+                  }
                 >
-                  {visibility ? "Private Project" : "Public Project"}
+                  {visibility === "private"
+                    ? "Private Project"
+                    : "Public Project"}
                 </Button>
 
                 <Description>
-                  {visibility
+                  {visibility === "private"
                     ? "Only you can view this project."
                     : "Anyone can view this project."}
                 </Description>

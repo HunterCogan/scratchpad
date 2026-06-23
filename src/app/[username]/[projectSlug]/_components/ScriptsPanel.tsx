@@ -33,6 +33,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { ScriptStack } from "./ScriptStack";
 import type { Script, AIFeedback } from "@/types";
+import { useRouter } from "next/navigation";
 
 interface Props {
   raw: string | undefined;
@@ -47,6 +48,7 @@ interface Props {
   feedbackTimestamp: string | null;
   canDelete: boolean;
   visibility: string | undefined;
+  projectId: string;
 }
 
 export function ScriptsPanel({
@@ -62,6 +64,7 @@ export function ScriptsPanel({
   feedbackTimestamp,
   canDelete,
   visibility,
+  projectId,
 }: Props) {
   // isEmpty overrides the toggle, as empty projects should be viewed raw.
   const isEmpty = Object.keys(scripts).length === 0;
@@ -70,11 +73,13 @@ export function ScriptsPanel({
     Object.keys(scripts).find((name) => scripts[name].length > 0) ?? "",
   );
   const targetScripts = scripts[selectedTarget] ?? [];
+  const router = useRouter();
 
   const deleteState = useOverlayState();
   const visibilityState = useOverlayState();
   const [loading, setLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [visibilityError, setVisibilityError] = useState<string | null>(null);
 
   async function handleDeleteRemix() {
     setLoading(true);
@@ -90,7 +95,39 @@ export function ScriptsPanel({
   }
 
   async function handleVisibilityChange() {
-    // API routing later "Backend code"
+    setLoading(true);
+    setVisibilityError(null);
+
+    try {
+      const newVisibility = visibility === "public" ? "private" : "public";
+
+      const res = await fetch(`/api/projects/${projectId}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          visibility: newVisibility,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+
+        setVisibilityError(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to update visibility",
+        );
+
+        return;
+      }
+
+      visibilityState.close();
+      router.refresh();
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
