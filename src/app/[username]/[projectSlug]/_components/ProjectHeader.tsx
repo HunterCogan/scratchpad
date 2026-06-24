@@ -16,6 +16,7 @@ import {
   Surface,
   TextArea,
   TextField,
+  Chip,
   Tooltip,
   useOverlayState,
 } from "@heroui/react";
@@ -50,6 +51,7 @@ interface ProjectHeaderProps {
   creatorName: string;
   creatorColor: string;
   creatorImagePath?: string;
+  visibility: string;
 }
 
 export function ProjectHeader({
@@ -66,9 +68,11 @@ export function ProjectHeader({
   creatorName,
   creatorColor,
   creatorImagePath,
+  visibility,
 }: ProjectHeaderProps) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
+  const [projectVisibility, setProjectVisibility] = useState(visibility);
   const [loading, setLoading] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -221,6 +225,16 @@ export function ProjectHeader({
           {saveError && (
             <p className="text-xs text-red-500 px-1">{saveError}</p>
           )}
+
+          <div className="flex items-center gap-2 px-1 mt-1">
+            <Chip
+              size="sm"
+              variant="secondary"
+              color={projectVisibility === "private" ? "warning" : "success"}
+            >
+              {projectVisibility === "private" ? "Private" : "Public"}
+            </Chip>
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-2 sm:items-end">

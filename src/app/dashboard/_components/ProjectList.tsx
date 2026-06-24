@@ -33,8 +33,11 @@ function ProjectRow({
 }) {
   const router = useRouter();
   const deleteState = useOverlayState();
+  const visibilityState = useOverlayState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visibility, setVisibility] = useState(project.visibility);
+  const [updatingVisibility, setUpdatingVisibility] = useState(false);
 
   async function handleDelete() {
     setLoading(true);
@@ -59,6 +62,32 @@ function ProjectRow({
     }
   }
 
+  async function handleVisibilityChange() {
+    const newVisibility = visibility === "private" ? "public" : "private";
+
+    setUpdatingVisibility(true);
+
+    try {
+      const res = await fetch(`/api/projects/${project.id}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          visibility: newVisibility,
+        }),
+      });
+
+      if (res.ok) {
+        setVisibility(newVisibility);
+        visibilityState.close();
+        router.refresh();
+      }
+    } finally {
+      setUpdatingVisibility(false);
+    }
+  }
+
   return (
     <Card className="w-full items-stretch flex-row">
       <div className="flex flex-1 flex-col gap-3">
@@ -68,11 +97,9 @@ function ProjectRow({
 
             <Chip
               size="sm"
-              variant={
-                project.visibility === "private" ? "primary" : "secondary"
-              }
+              variant={visibility === "private" ? "primary" : "secondary"}
             >
-              {project.visibility === "private" ? "Private" : "Public"}
+              {visibility === "private" ? "Private" : "Public"}
             </Chip>
           </div>
 
@@ -87,6 +114,56 @@ function ProjectRow({
             <Chip size="md">Created: {project.createdAt}</Chip>
           </div>
           <div className="flex gap-1 sm:ml-auto shrink-0">
+            <AlertDialog
+              isOpen={visibilityState.isOpen}
+              onOpenChange={visibilityState.setOpen}
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                onPress={visibilityState.open}
+              >
+                Change Visibility
+              </Button>
+
+              <AlertDialog.Backdrop>
+                <AlertDialog.Container>
+                  <AlertDialog.Dialog>
+                    <AlertDialog.CloseTrigger className="m-3" />
+
+                    <AlertDialog.Header>
+                      <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                        <AlertDialog.Icon />
+                        Change Visibility
+                      </AlertDialog.Heading>
+                    </AlertDialog.Header>
+
+                    <AlertDialog.Body>
+                      Current visibility:
+                      <strong className="ml-1">
+                        {visibility === "private" ? "Private" : "Public"}
+                      </strong>
+                    </AlertDialog.Body>
+
+                    <AlertDialog.Footer>
+                      <Button variant="outline" onPress={visibilityState.close}>
+                        Cancel
+                      </Button>
+
+                      <Button
+                        variant="primary"
+                        isDisabled={updatingVisibility}
+                        onPress={handleVisibilityChange}
+                      >
+                        {updatingVisibility && <Spinner size="sm" />}
+                        Make {visibility === "private" ? "Public" : "Private"}
+                      </Button>
+                    </AlertDialog.Footer>
+                  </AlertDialog.Dialog>
+                </AlertDialog.Container>
+              </AlertDialog.Backdrop>
+            </AlertDialog>
+
             <Button
               variant="outline"
               size="sm"

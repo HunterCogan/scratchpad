@@ -150,7 +150,7 @@ export default function CreateProjectModal() {
                   <FieldError />
                 </TextField>
 
-                <Label>Visibility</Label>
+                <Label>Project Visibility</Label>
 
                 <Button
                   variant={visibility === "private" ? "primary" : "secondary"}

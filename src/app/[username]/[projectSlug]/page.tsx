@@ -112,6 +112,7 @@ export default async function ProjectPage({
           slug={project.slug}
           creatorColor={creator.color ?? ""}
           creatorImagePath={creator.imagePath ?? undefined}
+          visibility={project.visibility}
         />
         <Separator />
         <ProjectContent

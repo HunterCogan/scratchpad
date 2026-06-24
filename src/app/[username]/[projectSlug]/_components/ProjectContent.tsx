@@ -222,8 +222,6 @@ export function ProjectContent({
             remixName={selectedRemix?.name ?? null}
             remixDescription={selectedRemix?.description ?? null}
             feedbackTimestamp={feedbackTimestamp}
-            visibility={visibility}
-            projectId={projectId}
             canDelete={
               selectedRemix !== null &&
               (userId === creatorId || userId === selectedRemix.uploaderId)
