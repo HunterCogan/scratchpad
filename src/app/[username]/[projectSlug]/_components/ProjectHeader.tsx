@@ -7,6 +7,7 @@ import {
   Avatar,
   Button,
   ButtonGroup,
+  Chip,
   Dropdown,
   FieldError,
   Header,
@@ -50,6 +51,7 @@ interface ProjectHeaderProps {
   creatorName: string;
   creatorColor: string;
   creatorImagePath?: string;
+  tags: string[];
 }
 
 export function ProjectHeader({
@@ -66,6 +68,7 @@ export function ProjectHeader({
   creatorName,
   creatorColor,
   creatorImagePath,
+  tags,
 }: ProjectHeaderProps) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
@@ -220,6 +223,16 @@ export function ProjectHeader({
           </TextField>
           {saveError && (
             <p className="text-xs text-red-500 px-1">{saveError}</p>
+          )}
+
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 px-1 mt-1">
+              {tags.map((tag) => (
+                <Chip key={tag} size="sm" variant="secondary">
+                  {tag}
+                </Chip>
+              ))}
+            </div>
           )}
         </div>
       </div>

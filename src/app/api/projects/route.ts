@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const result = ProjectSchema.omit({ creator: true }).safeParse({
       name: body.name,
       description: body.description || undefined,
+      tags: body.tags || [],
     });
 
     if (!result.success) {

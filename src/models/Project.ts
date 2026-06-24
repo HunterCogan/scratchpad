@@ -6,6 +6,7 @@ export interface IProject {
   name: string;
   slug: string;
   description?: string;
+  tags?: string[];
   team: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
@@ -35,6 +36,12 @@ const ProjectSchema = new mongoose.Schema<IProject>(
       trim: true,
       maxlength: [500, "Project description cannot exceed 500 characters"],
     },
+    tags: [
+      {
+        type: String,
+        enum: ["Game", "Tool", "Art", "Music", "Story"],
+      },
+    ],
     team: [
       {
         type: mongoose.Schema.Types.ObjectId,

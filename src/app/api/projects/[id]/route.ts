@@ -58,6 +58,7 @@ export async function PUT(
     const result = ProjectSchema.omit({ creator: true }).safeParse({
       name: body.name,
       description: body.description || undefined,
+      tags: body.tags || [],
     });
 
     if (!result.success) {
@@ -129,6 +130,10 @@ export async function PUT(
 
     if (body.description !== undefined) {
       project.description = body.description;
+    }
+
+    if (body.tags !== undefined) {
+      project.tags = body.tags;
     }
 
     await project.save();

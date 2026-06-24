@@ -32,6 +32,7 @@ export default async function UserProfilePage({
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
+    tags: p.tags ?? [],
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",

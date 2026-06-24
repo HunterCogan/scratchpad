@@ -20,6 +20,7 @@ type Project = {
   name: string;
   slug: string;
   description: string;
+  tags?: string[];
   createdAt: string;
   createdAtRaw: string;
 };
@@ -75,6 +76,12 @@ function ProjectRow({
         <Card.Footer className="flex-col items-start gap-2 sm:flex-row sm:items-center">
           <div className="flex gap-1 flex-wrap">
             <Chip size="md">Created: {project.createdAt}</Chip>
+
+            {project.tags?.map((tag) => (
+              <Chip key={tag} size="md" variant="secondary">
+                {tag}
+              </Chip>
+            ))}
           </div>
           <div className="flex gap-1 sm:ml-auto shrink-0">
             <Button

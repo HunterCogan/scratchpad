@@ -9,6 +9,7 @@ export type UserProject = {
   name: string;
   slug: string;
   description: string;
+  tags?: string[];
   createdAt: string;
 };
 
@@ -35,6 +36,12 @@ function ProjectRow({
         <Card.Footer>
           <div className="flex gap-1 flex-wrap">
             <Chip size="md">Created: {project.createdAt}</Chip>
+
+            {project.tags?.map((tag) => (
+              <Chip key={tag} size="md" variant="secondary">
+                {tag}
+              </Chip>
+            ))}
           </div>
           <div className="flex gap-1 ml-auto shrink-0">
             <Button
