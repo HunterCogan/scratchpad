@@ -38,7 +38,7 @@ export default function UserProfile({
         <Card
           variant="transparent"
           render={(props) => <aside {...props} />}
-          className="flex flex-col gap-4 md:w-72 w-full shrink-0 items-center"
+          className="flex flex-col gap-4 p-0 rounded-none overflow-visible md:w-72 w-full shrink-0 items-center"
         >
           <Avatar size="lg" className="h-48 w-48 rounded-full">
             <Avatar.Image src={imageUrl} alt={name} />

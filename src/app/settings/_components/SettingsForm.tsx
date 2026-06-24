@@ -319,7 +319,7 @@ export default function SettingsForm({
         <Card
           variant="transparent"
           render={(props) => <aside {...props} />}
-          className="flex flex-col gap-4 md:w-64 shrink-0 items-center"
+          className="flex flex-col gap-4 p-0 rounded-none overflow-visible md:w-64 shrink-0 items-center"
         >
           <Button
             type="button"
@@ -391,14 +391,15 @@ export default function SettingsForm({
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
-                  className="h-9 w-9 p-0 cursor-pointer rounded border border-default-200 bg-transparent"
+                  style={{ width: "2.25rem", height: "2.25rem", padding: 0 }}
+                  className="shrink-0 cursor-pointer rounded border border-default-200 bg-transparent"
                   aria-label="Pick avatar color"
                 />
                 <Input
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   placeholder="#808080"
-                  className="flex-1"
+                  className="flex-1 min-w-0"
                 />
               </div>
             </div>
@@ -411,7 +412,7 @@ export default function SettingsForm({
         />
 
         <Form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5">
-          <TextField isRequired>
+          <TextField>
             <Label>Display name</Label>
             <Input
               value={name}
