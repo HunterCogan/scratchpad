@@ -25,29 +25,53 @@ export default async function UserProfilePage({
   const viewerId = session?.user?.id;
   const isOwner = viewerId === userId;
 
-  const projects = await ProjectModel.find(
-    isOwner
-      ? {
-          creator: user._id,
-        }
-      : {
-          creator: user._id,
-          visibility: "public",
-        },
-  )
-    .sort({ createdAt: -1 })
-    .lean();
+  const [projects, collaboratingProjects] = await Promise.all([
+    ProjectModel.find(
+      isOwner
+        ? {
+            creator: user._id,
+          }
+        : {
+            creator: user._id,
+            visibility: "public",
+          },
+    )
+      .sort({ createdAt: -1 })
+      .lean(),
+
+    ProjectModel.find({
+      team: user._id,
+      creator: { $ne: user._id },
+    })
+      .sort({ createdAt: -1 })
+      .populate<{ creator: { username: string } }>("creator", "username")
+      .lean(),
+  ]);
+
+  const formatDate = (date: Date) =>
+    new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
 
   const serializedProjects = projects.map((p) => ({
     id: p._id.toString(),
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
-    createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
+    createdAt: formatDate(p.createdAt),
+    createdAtRaw: p.createdAt.toISOString(),
+  }));
+
+  const serializedCollaboratingProjects = collaboratingProjects.map((p) => ({
+    id: p._id.toString(),
+    name: p.name,
+    slug: p.slug,
+    description: p.description ?? "",
+    createdAt: formatDate(p.createdAt),
+    createdAtRaw: p.createdAt.toISOString(),
+    ownerUsername: p.creator.username,
   }));
 
   return (
@@ -57,8 +81,10 @@ export default async function UserProfilePage({
       color={user.color ?? "#808080"}
       imagePath={user.imagePath ?? undefined}
       about={user.about ?? ""}
-      isOwner={session?.user?.id === userId}
+      email={isOwner ? user.email : undefined}
+      isOwner={isOwner}
       projects={serializedProjects}
+      collaboratingProjects={serializedCollaboratingProjects}
     />
   );
 }
