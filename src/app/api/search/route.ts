@@ -36,10 +36,19 @@ export async function GET(request: NextRequest) {
 
       const userIds = users.map((u) => u._id);
       const projectCounts = await ProjectModel.aggregate([
-        { $match: { creator: { $in: userIds } } },
-        { $group: { _id: "$creator", count: { $sum: 1 } } },
+        {
+          $match: {
+            creator: { $in: userIds },
+            visibility: "public",
+          },
+        },
+        {
+          $group: {
+            _id: "$creator",
+            count: { $sum: 1 },
+          },
+        },
       ]);
-
       const countMap = new Map(
         projectCounts.map((p) => [p._id.toString(), p.count]),
       );
@@ -55,7 +64,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results });
     }
 
-    const projects = await ProjectModel.find({ name: regex })
+    const projects = await ProjectModel.find({
+      name: regex,
+      visibility: "public",
+    })
       .select("_id name slug creator")
       .limit(8)
       .lean();

@@ -22,8 +22,19 @@ export default async function UserProfilePage({
   }
 
   const userId = user._id.toString();
+  const viewerId = session?.user?.id;
+  const isOwner = viewerId === userId;
 
-  const projects = await ProjectModel.find({ creator: user._id })
+  const projects = await ProjectModel.find(
+    isOwner
+      ? {
+          creator: user._id,
+        }
+      : {
+          creator: user._id,
+          visibility: "public",
+        },
+  )
     .sort({ createdAt: -1 })
     .lean();
 
