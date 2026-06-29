@@ -24,6 +24,7 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
 import {
   InformationCircleIcon,
+  TagIcon,
   UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -225,15 +226,22 @@ export function ProjectHeader({
             <p className="text-xs text-red-500 px-1">{saveError}</p>
           )}
 
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 px-1 mt-1">
-              {tags.map((tag) => (
-                <Chip key={tag} size="md" variant="secondary">
-                  {tag}
-                </Chip>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-1 px-1 mt-1">
+            {tags.map((tag) => (
+              <Chip key={tag} size="md" variant="secondary">
+                {tag}
+              </Chip>
+            ))}
+
+            {userId === creatorId && (
+              <Chip size="md" variant="secondary" className="cursor-pointer">
+                <div className="flex items-center gap-1">
+                  <TagIcon className="h-3.5 w-3.5" />
+                  <span>Add Tag</span>
+                </div>
+              </Chip>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-2 sm:items-end">
@@ -316,87 +324,92 @@ export function ProjectHeader({
         </div>
         {!isVisitor && (
           <div className="flex justify-between items-end gap-1">
-            <CreateRemixModal
-              projectId={projectId}
-              creatorId={creatorId}
-            ></CreateRemixModal>
-            <ButtonGroup>
-              {userId === creatorId && (
-                <AddCollaboratorModal
-                  projectId={projectId}
-                  creatorId={creatorId}
-                  isDisabled={userId !== creatorId}
-                  teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
-                  onMemberAdded={handleMemberAdded}
-                  onMemberRemoved={handleMemberRemoved}
-                />
-              )}
-              {userId !== creatorId && (
-                <AlertDialog
-                  isOpen={leaveState.isOpen}
-                  onOpenChange={leaveState.setOpen}
-                >
-                  <Button
-                    isIconOnly
-                    onPress={leaveState.open}
-                    variant="secondary"
-                    size="sm"
+            <CreateRemixModal projectId={projectId} creatorId={creatorId} />
+
+            <div className="flex items-center gap-1">
+              <ButtonGroup>
+                {userId === creatorId && (
+                  <AddCollaboratorModal
+                    projectId={projectId}
+                    creatorId={creatorId}
+                    isDisabled={userId !== creatorId}
+                    teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
+                    onMemberAdded={handleMemberAdded}
+                    onMemberRemoved={handleMemberRemoved}
+                  />
+                )}
+
+                {userId !== creatorId && (
+                  <AlertDialog
+                    isOpen={leaveState.isOpen}
+                    onOpenChange={leaveState.setOpen}
                   >
-                    <ButtonGroup.Separator />
-                    <UserMinusIcon />
-                  </Button>
+                    <Button
+                      isIconOnly
+                      onPress={leaveState.open}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      <ButtonGroup.Separator />
+                      <UserMinusIcon />
+                    </Button>
 
-                  <AlertDialog.Backdrop>
-                    <AlertDialog.Container>
-                      <AlertDialog.Dialog>
-                        <AlertDialog.CloseTrigger className="m-3" />
+                    <AlertDialog.Backdrop>
+                      <AlertDialog.Container>
+                        <AlertDialog.Dialog>
+                          <AlertDialog.CloseTrigger className="m-3" />
 
-                        <AlertDialog.Header>
-                          <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
-                            <AlertDialog.Icon />
-                            Leave Project?
-                          </AlertDialog.Heading>
-                        </AlertDialog.Header>
+                          <AlertDialog.Header>
+                            <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                              <AlertDialog.Icon />
+                              Leave Project?
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
 
-                        <AlertDialog.Body>
-                          {team.length === 0 ? (
-                            <p>
-                              <strong>{name}</strong> will be permanently
-                              deleted. This cannot be undone.
-                            </p>
-                          ) : (
-                            <p>
-                              You will no longer be able to contribute to this
-                              project.
-                            </p>
-                          )}
-                          {leaveError && (
-                            <p className="text-red-500 text-sm mt-2">
-                              {leaveError}
-                            </p>
-                          )}
-                        </AlertDialog.Body>
+                          <AlertDialog.Body>
+                            {team.length === 0 ? (
+                              <p>
+                                <strong>{name}</strong> will be permanently
+                                deleted. This cannot be undone.
+                              </p>
+                            ) : (
+                              <p>
+                                You will no longer be able to contribute to this
+                                project.
+                              </p>
+                            )}
 
-                        <AlertDialog.Footer>
-                          <Button variant="tertiary" onPress={leaveState.close}>
-                            Cancel
-                          </Button>
+                            {leaveError && (
+                              <p className="text-red-500 text-sm mt-2">
+                                {leaveError}
+                              </p>
+                            )}
+                          </AlertDialog.Body>
 
-                          <Button
-                            variant="danger"
-                            isDisabled={loading}
-                            onPress={handleLeaveProject}
-                          >
-                            {loading && <Spinner size="sm" />}
-                            {loading ? "Leaving..." : "Leave"}
-                          </Button>
-                        </AlertDialog.Footer>
-                      </AlertDialog.Dialog>
-                    </AlertDialog.Container>
-                  </AlertDialog.Backdrop>
-                </AlertDialog>
-              )}
-            </ButtonGroup>
+                          <AlertDialog.Footer>
+                            <Button
+                              variant="tertiary"
+                              onPress={leaveState.close}
+                            >
+                              Cancel
+                            </Button>
+
+                            <Button
+                              variant="danger"
+                              isDisabled={loading}
+                              onPress={handleLeaveProject}
+                            >
+                              {loading && <Spinner size="sm" />}
+                              {loading ? "Leaving..." : "Leave"}
+                            </Button>
+                          </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                      </AlertDialog.Container>
+                    </AlertDialog.Backdrop>
+                  </AlertDialog>
+                )}
+              </ButtonGroup>
+            </div>
           </div>
         )}
       </div>
