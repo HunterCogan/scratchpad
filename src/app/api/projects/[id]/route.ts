@@ -1,5 +1,6 @@
 import { verifySession } from "@/lib/dal";
 import { NextRequest, NextResponse } from "next/server";
+import { canViewProject } from "@/lib/permissions/canViewProject";
 import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
 import RemixModel from "@/models/Remix";
@@ -25,13 +26,19 @@ export async function GET(
     const session = await verifySession();
     await connectDB();
 
-    const project = await ProjectModel.findOne({
-      _id: new mongoose.Types.ObjectId(id),
-      creator: new mongoose.Types.ObjectId(session.userId),
-    });
+    const project = await ProjectModel.findById(id).lean();
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    const allowed = canViewProject(session.userId, project);
+
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Project is private or you don't have access" },
+        { status: 403 },
+      );
     }
 
     const remixes = await RemixModel.find({ project: project._id })

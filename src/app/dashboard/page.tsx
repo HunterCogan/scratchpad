@@ -8,14 +8,17 @@ import CreateProjectModal from "./_components/CreateProjectModal";
 
 export default async function DashboardPage() {
   const session = await verifySession();
-
   await connectDB();
 
-  const user = await UserModel.findById(session.userId).lean();
+  const userId = session.userId;
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
+  const user = await UserModel.findById(userId).lean();
 
   const projects = await ProjectModel.find({
-    creator: new mongoose.Types.ObjectId(session.userId),
+    $or: [{ creator: userObjectId }, { team: userObjectId }],
   })
+    .populate<{ creator: { username: string } }>("creator", "username")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -25,6 +28,7 @@ export default async function DashboardPage() {
     slug: p.slug,
     description: p.description ?? "",
     visibility: p.visibility,
+    ownerUsername: p.creator.username,
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -43,11 +47,13 @@ export default async function DashboardPage() {
             </h1>
             <p className="text-sm mt-1">Create and manage your Projects</p>
           </div>
+
           <CreateProjectModal />
         </div>
+
         <ProjectList
           projects={serialized}
-          username={user?.username ?? session.userId}
+          username={user?.username ?? userId}
         />
       </main>
     </div>

@@ -60,6 +60,7 @@ export default async function UserProfilePage({
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
+    visibility: p.visibility,
     createdAt: formatDate(p.createdAt),
     createdAtRaw: p.createdAt.toISOString(),
   }));
@@ -69,6 +70,7 @@ export default async function UserProfilePage({
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
+    visibility: p.visibility,
     createdAt: formatDate(p.createdAt),
     createdAtRaw: p.createdAt.toISOString(),
     ownerUsername: p.creator.username,

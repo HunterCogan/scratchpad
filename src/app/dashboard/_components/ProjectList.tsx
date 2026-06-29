@@ -20,23 +20,16 @@ type Project = {
   createdAt: string;
   createdAtRaw: string;
   visibility: string;
+  ownerUsername: string;
 };
-
 // A List of all the projects for a user. Has View button which goes to the project page,
 // and Delete button which opens a confirmation dialog before deleting the project.
-function ProjectRow({
-  project,
-  username,
-}: {
-  project: Project;
-  username: string;
-}) {
+function ProjectRow({ project }: { project: Project; username: string }) {
   const router = useRouter();
   const deleteState = useOverlayState();
-  const visibilityState = useOverlayState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [visibility, setVisibility] = useState(project.visibility);
+  const [visibility] = useState(project.visibility);
 
   async function handleDelete() {
     setLoading(true);
@@ -68,7 +61,10 @@ function ProjectRow({
           <div className="flex items-center justify-between w-full gap-2">
             <Card.Title>{project.name}</Card.Title>
 
-            <Chip variant={visibility === "private" ? "primary" : "secondary"}>
+            <Chip
+              variant="secondary"
+              color={visibility === "private" ? "warning" : "success"}
+            >
               {visibility === "private" ? "Private" : "Public"}
             </Chip>
           </div>
@@ -87,7 +83,9 @@ function ProjectRow({
             <Button
               variant="outline"
               size="sm"
-              onPress={() => router.push(`/${username}/${project.slug}`)}
+              onPress={() =>
+                router.push(`/${project.ownerUsername}/${project.slug}`)
+              }
             >
               <EyeIcon className="h-4 w-4" />
               View
