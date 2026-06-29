@@ -6,7 +6,7 @@ import { Badge, Popover, ToggleButton } from "@heroui/react";
 import { Avatar, Card, Chip, ScrollShadow, Link } from "@heroui/react";
 import { parseScripts } from "@/lib/scratch";
 import { ScriptsPanel } from "./ScriptsPanel";
-import type { AIFeedback } from "@/types";
+import type { AIFeedback, FeedbackStatus } from "@/types";
 import { StarIcon } from "@heroicons/react/16/solid";
 
 export type RemixItem = {
@@ -42,7 +42,8 @@ export function ProjectContent({
   const defaultId = (remixes.find((r) => r.isMain) ?? remixes[0])?.id ?? null;
   const [selectedId, setSelectedId] = useState<string | null>(defaultId);
   const [aiFeedback, setAiFeedback] = useState<AIFeedback | null>(null);
-  const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>("idle");
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [feedbackTimestamp, setFeedbackTimestamp] = useState<string | null>(
     null,
   );
@@ -60,8 +61,9 @@ export function ProjectContent({
 
   async function handleGetFeedback() {
     if (!selectedRemix) return;
-    setLoadingFeedback(true);
+    setFeedbackStatus("loading");
     setAiFeedback(null);
+    setFeedbackError(null);
     try {
       const res = await fetch("/api/ai/feedback/block", {
         method: "POST",
@@ -70,17 +72,19 @@ export function ProjectContent({
       });
       const data = await res.json();
       if (!res.ok) {
-        setAiFeedback({
-          what_works_well: "",
-          suggestions: [],
-          logic_issues: [],
-          error:
-            data.error ??
+        setFeedbackError(
+          data.error ??
             "Something went wrong on our end. Please try again later.",
-        });
+        );
+        setFeedbackStatus("error");
         return;
       }
-      setAiFeedback(data.feedback ?? null);
+      if (data.feedback) {
+        setAiFeedback(data.feedback);
+        setFeedbackStatus("ready");
+      } else {
+        setFeedbackStatus("empty");
+      }
       setFeedbackTimestamp(
         new Date().toLocaleTimeString([], {
           hour: "2-digit",
@@ -88,14 +92,8 @@ export function ProjectContent({
         }),
       );
     } catch {
-      setAiFeedback({
-        what_works_well: "",
-        suggestions: [],
-        logic_issues: [],
-        error: "Network error. Check your connection and try again.",
-      });
-    } finally {
-      setLoadingFeedback(false);
+      setFeedbackError("Network error. Check your connection and try again.");
+      setFeedbackStatus("error");
     }
   }
 
@@ -197,6 +195,8 @@ export function ProjectContent({
                       onPress={() => {
                         setSelectedId(remix.id);
                         setAiFeedback(null);
+                        setFeedbackError(null);
+                        setFeedbackStatus("idle");
                         setFeedbackTimestamp(null);
                       }}
                     >
@@ -215,7 +215,8 @@ export function ProjectContent({
             raw={selectedRemix?.projectJsonData}
             scripts={scripts}
             aiFeedback={aiFeedback}
-            loadingFeedback={loadingFeedback}
+            feedbackStatus={feedbackStatus}
+            feedbackError={feedbackError}
             onGetFeedback={handleGetFeedback}
             onDeleteRemix={handleDeleteRemix}
             hasSelectedRemix={selectedRemix !== null}
