@@ -28,7 +28,7 @@ import {
   UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { ProjectSchema } from "@/lib/schemas/project.zod";
+import { ProjectSchema, PROJECT_TAGS } from "@/lib/schemas/project.zod";
 
 interface TeamMember {
   id: string;
@@ -72,6 +72,7 @@ export function ProjectHeader({
   tags,
 }: ProjectHeaderProps) {
   const [name, setName] = useState(initialName);
+  const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
   const [description, setDescription] = useState(initialDescription);
   const [loading, setLoading] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
@@ -234,12 +235,32 @@ export function ProjectHeader({
             ))}
 
             {userId === creatorId && (
-              <Chip size="md" variant="secondary" className="cursor-pointer">
-                <div className="flex items-center gap-1">
-                  <TagIcon className="h-3.5 w-3.5" />
-                  <span>Add Tag</span>
-                </div>
-              </Chip>
+              <Dropdown isOpen={isTagMenuOpen} onOpenChange={setIsTagMenuOpen}>
+                <Dropdown.Trigger>
+                  <Chip
+                    size="md"
+                    variant="secondary"
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center gap-1">
+                      <TagIcon className="h-3.5 w-3.5" />
+                      <span>Add Tag</span>
+                    </div>
+                  </Chip>
+                </Dropdown.Trigger>
+
+                <Dropdown.Popover>
+                  <Dropdown.Menu>
+                    <Dropdown.Section>
+                      <Header>Select a tag</Header>
+
+                      {PROJECT_TAGS.map((tag) => (
+                        <Dropdown.Item key={tag}>{tag}</Dropdown.Item>
+                      ))}
+                    </Dropdown.Section>
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
             )}
           </div>
         </div>
