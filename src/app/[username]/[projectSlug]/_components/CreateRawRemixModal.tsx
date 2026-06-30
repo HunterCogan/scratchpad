@@ -84,7 +84,7 @@ export default function CreateRawRemixModal({
 
   return (
     <Modal state={state}>
-      <Button isIconOnly size="sm" variant="ghost">
+      <Button isIconOnly size="sm" variant="ghost" className="h-6.5 w-6.5">
         <PlusIcon className="h-4 w-4" />
       </Button>
       <Modal.Backdrop>
