@@ -406,8 +406,10 @@ export function ProjectContent({
                 {selectedRemix.description}
               </ScrollShadow>
               {selectedRemix.remixType === "raw" && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-foreground/50">Language</span>
+                <div className="flex items-center">
+                  <Label className="text-xs text-foreground/50 font-semibold">
+                    Language:
+                  </Label>
                   <Chip size="sm" variant="secondary">
                     {languageDisplayName(
                       fileNameToLanguage(selectedRemix.fileName),
