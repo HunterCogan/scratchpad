@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Badge, Button, Label, Popover, ToggleButton } from "@heroui/react";
 import { Avatar, Card, Chip, ScrollShadow, Link } from "@heroui/react";
@@ -36,6 +36,15 @@ import { ScriptsPanel } from "./ScriptsPanel";
 import CreateRawRemixModal from "./CreateRawRemixModal";
 import type { AIFeedback, FeedbackStatus } from "@/types";
 import { StarIcon } from "@heroicons/react/16/solid";
+
+function subscribeToDesktop(cb: () => void) {
+  const mq = window.matchMedia("(min-width: 640px)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+const getDesktopSnapshot = () =>
+  window.matchMedia("(min-width: 640px)").matches;
+const getDesktopServerSnapshot = () => false;
 
 export type RemixItem = {
   id: string;
@@ -96,20 +105,13 @@ export function ProjectContent({
 
   const [panelWidth, setPanelWidth] = useState(240);
   const [collapsed, setCollapsed] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia("(min-width: 640px)").matches
-      : false,
+  const isDesktop = useSyncExternalStore(
+    subscribeToDesktop,
+    getDesktopSnapshot,
+    getDesktopServerSnapshot,
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   function startResize(e: React.MouseEvent) {
     e.preventDefault();
@@ -394,7 +396,7 @@ export function ProjectContent({
                 {selectedRemix.createdAt} by{" "}
                 <Link
                   target="_blank"
-                  href={`/users/${selectedRemix.uploaderUsername}`}
+                  href={`/${selectedRemix.uploaderUsername}`}
                 >
                   {selectedRemix.uploaderName}
                   <Link.Icon />
