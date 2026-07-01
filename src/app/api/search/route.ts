@@ -4,21 +4,9 @@ import UserModel from "@/models/User";
 import ProjectModel from "@/models/Project";
 import RemixModel from "@/models/Remix";
 import { verifySession } from "@/lib/dal";
-import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
   try {
-    let userObjectId: mongoose.Types.ObjectId | null = null;
-
-    try {
-      const session = await verifySession();
-      userObjectId = new mongoose.Types.ObjectId(session.userId);
-    } catch {
-      console.log(
-        "No valid session found, proceeding as unauthenticated user.",
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q")?.trim();
     const category = searchParams.get("category") ?? "projects";
@@ -48,20 +36,9 @@ export async function GET(request: NextRequest) {
         .lean();
 
       const userIds = users.map((u) => u._id);
-
       const projectCounts = await ProjectModel.aggregate([
-        {
-          $match: {
-            creator: { $in: userIds },
-            visibility: "public",
-          },
-        },
-        {
-          $group: {
-            _id: "$creator",
-            count: { $sum: 1 },
-          },
-        },
+        { $match: { creator: { $in: userIds } } },
+        { $group: { _id: "$creator", count: { $sum: 1 } } },
       ]);
 
       const countMap = new Map(
@@ -79,39 +56,44 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results });
     }
 
-    const projectQuery: Record<string, unknown> = {
-      name: regex,
-    };
+    const session = await verifySession().catch(() => null);
+    const userId = session?.userId;
 
-    if (userObjectId) {
-      projectQuery.$or = [
-        { visibility: "public" },
-        { creator: userObjectId },
-        { team: userObjectId },
-      ];
-    } else {
-      projectQuery.visibility = "public";
-    }
-
-    const projects = await ProjectModel.find(projectQuery)
-      .select("_id name slug creator")
+    const projects = await ProjectModel.find({
+      $and: [
+        {
+          $or: [
+            { visibility: "public" },
+            { visibility: { $exists: false } },
+            ...(userId
+              ? [
+                  {
+                    visibility: "private" as const,
+                    creator: userId,
+                  },
+                  {
+                    visibility: "private" as const,
+                    team: userId,
+                  },
+                  {
+                    visibility: "public" as const,
+                  },
+                ]
+              : []),
+          ],
+        },
+        {
+          $or: [{ name: regex }, { slug: regex }, { description: regex }],
+        },
+      ],
+    })
       .limit(8)
       .lean();
 
     const projectIds = projects.map((p) => p._id);
-
     const remixCounts = await RemixModel.aggregate([
-      {
-        $match: {
-          project: { $in: projectIds },
-        },
-      },
-      {
-        $group: {
-          _id: "$project",
-          count: { $sum: 1 },
-        },
-      },
+      { $match: { project: { $in: projectIds } } },
+      { $group: { _id: "$project", count: { $sum: 1 } } },
     ]);
 
     const countMap = new Map(
@@ -119,7 +101,6 @@ export async function GET(request: NextRequest) {
     );
 
     const creatorIds = [...new Set(projects.map((p) => p.creator.toString()))];
-
     const creators = await UserModel.find({
       _id: { $in: creatorIds },
     })
